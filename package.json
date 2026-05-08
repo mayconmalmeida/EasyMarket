@@ -1,0 +1,22 @@
+{
+  "name": "easymarket",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "setup:env": "node scripts/setup-env.cjs",
+    "dev": "concurrently -n api,web -c blue,green \"npm run -w @easymarket/api start:dev\" \"npm run -w @easymarket/web dev\"",
+    "build": "npm run -w @easymarket/api build && npm run -w @easymarket/web build",
+    "db:migrate": "npm run -w @easymarket/api prisma:migrate",
+    "db:seed": "npm run -w @easymarket/api prisma:seed",
+    "db:setup": "npm run setup:env && npm run db:migrate && npm run db:seed",
+    "db:check": "npm run -w @easymarket/api db:check",
+    "lint": "npm run -w @easymarket/api lint",
+    "test": "npm run -w @easymarket/api test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

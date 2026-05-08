@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: #1f2937;
+  background: #eaf3ff;
+}
+
+:root {
+  --brand-blue: #0057d9;
+  --brand-blue-dark: #003b8e;
+  --brand-blue-light: #eaf3ff;
+  --brand-text: #1f2937;
+}
+
+.p-component {
+  color: var(--brand-text);
+}
+
+.p-inputtext {
+  color: var(--brand-text);
+  border-radius: 0.75rem;
+}
+
+.p-button {
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+.p-button:not(.p-button-secondary) {
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
+}
+
+.p-button:not(.p-button-secondary):hover {
+  background: var(--brand-blue-dark);
+  border-color: var(--brand-blue-dark);
+}
+
+.admin-saas .p-inputtext {
+  border-radius: 0.75rem;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.admin-saas .p-button {
+  border-radius: 0.75rem;
+}
+
+.admin-saas .p-datatable .p-datatable-tbody > tr:hover {
+  background: #f5f7fb;
+}

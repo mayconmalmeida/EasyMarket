@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  COLLABORATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PaymentMethod {
+  CASH
+  PIX
+  NONE
+}
+
+enum PaymentStatus {
+  PAID
+  PAYROLL_DEDUCTION
+  PENDING
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SectorStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum NotificationType {
+  PAYMENT_CONFIRMED
+  PAYMENT_RECORDED
+}
+
+model Sector {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  status    SectorStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[] @relation("UserSector")
+}
+
+model MonthlyClosing {
+  id         String   @id @default(uuid())
+  year       Int
+  month      Int
+  closedAt   DateTime @default(now())
+  closedById String
+  closedBy   User     @relation(fields: [closedById], references: [id])
+
+  withdrawals Withdrawal[]
+
+  @@unique([year, month])
+  @@index([closedById, closedAt])
+}
+
+model User {
+  id               String      @id @default(uuid())
+  name             String
+  code             String      @unique
+  pinHash          String
+  sector           String?
+  sectorId         String?
+  sectorRef        Sector?     @relation("UserSector", fields: [sectorId], references: [id])
+  role             UserRole
+  status           UserStatus  @default(ACTIVE)
+  refreshTokenHash String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  withdrawals Withdrawal[]
+  closedMonths MonthlyClosing[]
+  auditLogs   AuditLog[]   @relation("AuditActor")
+  notifications Notification[]
+
+  @@index([sectorId])
+}
+
+model Product {
+  id        String        @id @default(uuid())
+  name      String
+  category  String
+  photoUrl  String?
+  priceCents Int
+  stock     Int
+  minStock  Int
+  status    ProductStatus @default(ACTIVE)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  items WithdrawalItem[]
+}
+
+model Category {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String         @default("")
+  color       String         @default("#0057D9")
+  icon        String         @default("pi pi-tag")
+  status      CategoryStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([status, name])
+}
+
+model AppSettings {
+  id                      String   @id @default(uuid())
+  marketName              String   @default("EasyMarket")
+  logoUrl                 String?
+  pixKey                  String   @default("")
+  pixQrCodeUrl            String   @default("")
+  primaryColor            String   @default("#0057D9")
+  minStockDefault         Int      @default(5)
+  collaboratorPortalEnabled Boolean @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model Withdrawal {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  monthlyClosingId String?
+  monthlyClosing   MonthlyClosing? @relation(fields: [monthlyClosingId], references: [id])
+  totalCents    Int
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus
+  createdAt     DateTime      @default(now())
+
+  items WithdrawalItem[]
+
+  @@index([monthlyClosingId])
+  @@index([userId, createdAt])
+}
+
+model WithdrawalItem {
+  id           String     @id @default(uuid())
+  withdrawalId String
+  withdrawal   Withdrawal @relation(fields: [withdrawalId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+  quantity     Int
+  unitPriceCents Int
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  actor     User     @relation("AuditActor", fields: [actorId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  message     String
+  meta        Json?
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt])
+}
