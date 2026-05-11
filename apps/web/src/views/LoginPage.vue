@@ -110,7 +110,7 @@ async function submit() {
     <div class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:py-12">
       <div class="flex flex-col justify-center">
         <div class="flex items-center gap-3">
-          <img :src="logo" class="h-24 w-24 object-cover" :alt="settings.marketName" />
+          <img :src="logo" class="h-28 w-28 object-cover md:h-40 md:w-40" :alt="settings.marketName" />
         </div>
         <div class="mt-8">
           <div class="text-2xl font-semibold text-[#003B8E]">{{ title ?? 'Entrar' }}</div>

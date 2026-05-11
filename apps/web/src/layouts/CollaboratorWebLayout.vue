@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
       <div class="absolute inset-0 bg-black/30" @click="mobileOpen = false" />
       <aside class="absolute left-0 top-0 h-full w-80 border-r border-[#E5E7EB] bg-white shadow-xl">
         <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
-          <img :src="logoSrc" class="h-14 w-14 object-cover" :alt="settings.marketName" />
+          <img :src="logoSrc" class="h-20 w-20 object-cover" :alt="settings.marketName" />
         </div>
 
         <nav class="p-4">
@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
       <aside class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
         <div class="flex h-full flex-col border-r border-[#E5E7EB] bg-white">
           <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
-            <img :src="logoSrc" class="h-14 w-14 object-cover" :alt="settings.marketName" />
+            <img :src="logoSrc" class="h-20 w-20 object-cover" :alt="settings.marketName" />
           </div>
 
           <nav class="flex-1 overflow-auto p-4">
