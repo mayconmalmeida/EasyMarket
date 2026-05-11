@@ -79,7 +79,7 @@ router.beforeEach(async (to) => {
   if (to.meta.role === 'ADMIN' && !auth.isAdmin) return '/colaborador/inicio';
   if (to.path.startsWith('/colaborador') && auth.isAdmin) return '/admin';
   if ((to.path === '/login' || to.path === '/admin/login' || to.path === '/colaborador/login') && auth.isAuthenticated)
-    return auth.isAdmin ? '/admin' : '/tablet';
+    return auth.isAdmin ? '/admin' : '/colaborador/inicio';
   if (!settings.collaboratorPortalEnabled && (to.path === '/me' || to.path.startsWith('/colaborador'))) return '/tablet';
   return true;
 });

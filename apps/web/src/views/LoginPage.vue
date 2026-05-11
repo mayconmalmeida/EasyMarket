@@ -94,7 +94,8 @@ async function submit() {
     else {
       const raw = route.query.redirect;
       const redirect = typeof raw === 'string' ? raw : '';
-      const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('/admin') ? redirect : '/tablet';
+      const defaultAfterLogin = route.path.startsWith('/colaborador') ? '/colaborador/inicio' : '/tablet';
+      const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('/admin') ? redirect : defaultAfterLogin;
       await router.push(safe);
     }
   } catch (e: any) {
