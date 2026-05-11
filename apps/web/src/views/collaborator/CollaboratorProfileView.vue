@@ -66,7 +66,7 @@ onMounted(load);
       <div class="flex items-center justify-between">
         <div>
           <div class="text-sm font-semibold text-slate-900">Meu Perfil</div>
-          <div class="mt-1 text-sm text-slate-600">Informações da sua conta no EasyMarket.</div>
+          <div class="mt-1 text-sm text-slate-600">Informações da sua conta.</div>
         </div>
         <Button label="Atualizar" severity="secondary" :loading="loading" @click="load" />
       </div>

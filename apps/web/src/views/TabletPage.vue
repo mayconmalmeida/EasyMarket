@@ -205,8 +205,7 @@ onMounted(async () => {
         <div class="flex min-w-0 items-center gap-3">
           <img :src="logoSrc" class="h-16 w-16 object-cover" :alt="settings.marketName" />
           <div class="min-w-0">
-            <div class="truncate text-sm font-semibold text-[#003B8E]">{{ settings.marketName }}</div>
-            <div class="truncate text-xs text-slate-600">{{ auth.user?.name }} ({{ auth.user?.code }})</div>
+            <div class="truncate text-sm font-semibold text-slate-700">{{ auth.user?.name }} ({{ auth.user?.code }})</div>
           </div>
         </div>
 

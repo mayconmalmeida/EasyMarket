@@ -120,7 +120,7 @@ async function savePaymentStatus() {
 
 function printReceipt(w: Withdrawal) {
   const lines = [
-    `<h2 style="margin:0 0 8px;font-family:system-ui">EasyMarket</h2>`,
+    `<h2 style="margin:0 0 8px;font-family:system-ui">Comprovante</h2>`,
     `<div style="font-family:system-ui;font-size:14px;color:#1F2937">`,
     `<div><b>Retirada:</b> ${w.id}</div>`,
     `<div><b>Data/Hora:</b> ${new Date(w.createdAt).toLocaleString('pt-BR')}</div>`,

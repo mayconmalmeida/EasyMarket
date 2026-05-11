@@ -97,7 +97,7 @@ onMounted(load);
     <div class="rounded-xl bg-white p-6 shadow">
       <div class="text-text text-lg font-semibold">Pendências</div>
       <div v-if="pendingTotal > 0" class="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-status-pending">
-        Você possui {{ formatBRL(pendingTotal) }} pendentes no EasyMarket.
+        Você possui {{ formatBRL(pendingTotal) }} pendentes.
       </div>
       <div v-if="pending.length === 0" class="mt-3 text-sm text-slate-600">Nenhuma pendência.</div>
       <div v-else class="mt-4 space-y-3">

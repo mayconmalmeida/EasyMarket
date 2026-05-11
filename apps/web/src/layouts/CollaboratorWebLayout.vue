@@ -126,10 +126,6 @@ onBeforeUnmount(() => {
       <aside class="absolute left-0 top-0 h-full w-80 border-r border-[#E5E7EB] bg-white shadow-xl">
         <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
           <img :src="logoSrc" class="h-14 w-14 object-cover" :alt="settings.marketName" />
-          <div class="min-w-0">
-            <div class="truncate text-sm font-semibold text-slate-900">{{ settings.marketName }}</div>
-            <div class="text-xs text-slate-600">Portal do Colaborador</div>
-          </div>
         </div>
 
         <nav class="p-4">
@@ -180,10 +176,6 @@ onBeforeUnmount(() => {
         <div class="flex h-full flex-col border-r border-[#E5E7EB] bg-white">
           <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
             <img :src="logoSrc" class="h-14 w-14 object-cover" :alt="settings.marketName" />
-            <div class="min-w-0">
-              <div class="truncate text-sm font-semibold text-slate-900">{{ settings.marketName }}</div>
-              <div class="text-xs text-slate-600">Portal do Colaborador</div>
-            </div>
           </div>
 
           <nav class="flex-1 overflow-auto p-4">
@@ -380,7 +372,7 @@ onBeforeUnmount(() => {
         <main class="mx-auto max-w-7xl px-6 py-6">
           <div class="mb-6">
             <div class="text-2xl font-semibold tracking-tight text-slate-900">{{ title }}</div>
-            <div class="mt-1 text-sm text-slate-600">Acompanhe consumo, pendências e pagamentos do EasyMarket.</div>
+            <div class="mt-1 text-sm text-slate-600">Acompanhe consumo, pendências e pagamentos.</div>
           </div>
           <RouterView />
         </main>

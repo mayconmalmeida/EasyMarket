@@ -111,10 +111,6 @@ async function submit() {
       <div class="flex flex-col justify-center">
         <div class="flex items-center gap-3">
           <img :src="logo" class="h-24 w-24 object-cover" :alt="settings.marketName" />
-          <div>
-            <div class="text-sm font-semibold text-[#003B8E]">{{ settings.marketName }}</div>
-            <div class="text-xs text-slate-600">{{ isAdminLogin ? 'Acesso administrativo' : 'Autoatendimento' }}</div>
-          </div>
         </div>
         <div class="mt-8">
           <div class="text-2xl font-semibold text-[#003B8E]">{{ title ?? 'Entrar' }}</div>

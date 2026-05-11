@@ -56,14 +56,10 @@ async function submit() {
       <div class="hidden flex-col justify-between px-10 py-12 lg:flex">
         <div class="flex items-center gap-3">
           <img :src="logo" class="h-24 w-24 object-cover" alt="EasyMarket" />
-          <div>
-            <div class="text-sm font-semibold text-[#003B8E]">{{ settings.marketName }}</div>
-            <div class="text-xs text-slate-600">Portal Administrativo</div>
-          </div>
         </div>
 
         <div class="max-w-md">
-          <div class="text-3xl font-semibold tracking-tight text-slate-900">Gestão do EasyMarket</div>
+          <div class="text-3xl font-semibold tracking-tight text-slate-900">Portal Administrativo</div>
           <div class="mt-3 text-sm leading-6 text-slate-600">
             Controle de retiradas, pendências, produtos e fechamento mensal em um portal corporativo.
           </div>
@@ -80,7 +76,7 @@ async function submit() {
           </div>
         </div>
 
-        <div class="text-xs text-slate-500">© {{ new Date().getFullYear() }} EasyMarket</div>
+        <div class="text-xs text-slate-500">© {{ new Date().getFullYear() }}</div>
       </div>
 
       <div class="flex items-center justify-center px-4 py-10">
