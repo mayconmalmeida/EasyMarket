@@ -5,7 +5,7 @@
     <template v-else>
       <header class="bg-white shadow-sm">
         <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
-          <img :src="headerLogo" class="h-8 w-auto" alt="EasyMarket" />
+          <img :src="headerLogo" class="h-12 w-auto" alt="EasyMarket" />
           <div class="text-primary-dark text-base font-semibold">{{ settings.marketName }}</div>
         </div>
       </header>
