@@ -203,7 +203,7 @@ onMounted(async () => {
     <header class="sticky top-0 z-20 border-b border-[#EAF3FF] bg-white/90 backdrop-blur">
       <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
         <div class="flex min-w-0 items-center gap-3">
-          <img :src="logoSrc" class="h-16 w-auto" :alt="settings.marketName" />
+          <img :src="logoSrc" class="h-16 w-16 object-cover" :alt="settings.marketName" />
           <div class="min-w-0">
             <div class="truncate text-sm font-semibold text-[#003B8E]">{{ settings.marketName }}</div>
             <div class="truncate text-xs text-slate-600">{{ auth.user?.name }} ({{ auth.user?.code }})</div>
