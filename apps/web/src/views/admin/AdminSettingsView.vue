@@ -77,7 +77,7 @@ onMounted(async () => {
             <label class="text-sm font-medium text-slate-700">Logo (URL)</label>
             <InputText v-model="form.logoUrl" class="w-full" placeholder="https://..." />
             <div class="mt-2 flex items-center gap-3">
-              <img :src="previewLogo" class="h-14 w-auto rounded-xl border border-[#E5E7EB] bg-white p-1" alt="Logo" />
+              <img :src="previewLogo" class="h-20 w-auto rounded-xl border border-[#E5E7EB] bg-white p-1" alt="Logo" />
             </div>
           </div>
 

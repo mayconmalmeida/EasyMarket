@@ -110,7 +110,7 @@ async function submit() {
     <div class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:py-12">
       <div class="flex flex-col justify-center">
         <div class="flex items-center gap-3">
-          <img :src="logo" class="h-14 w-auto" :alt="settings.marketName" />
+          <img :src="logo" class="h-20 w-auto" :alt="settings.marketName" />
           <div>
             <div class="text-sm font-semibold text-[#003B8E]">{{ settings.marketName }}</div>
             <div class="text-xs text-slate-600">{{ isAdminLogin ? 'Acesso administrativo' : 'Autoatendimento' }}</div>
