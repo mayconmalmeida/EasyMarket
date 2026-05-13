@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
@@ -16,6 +17,7 @@ type StatusOption = { label: string; value: 'ALL' | 'ACTIVE' | 'INACTIVE' };
 const productsStore = useProductsStore();
 const categoriesStore = useCategoriesStore();
 const settings = useSettingsStore();
+const router = useRouter();
 
 const search = ref('');
 const category = ref<string | 'ALL'>('ALL');
@@ -32,8 +34,10 @@ const error = ref<string | null>(null);
 const selected = ref<Product | null>(null);
 
 const form = ref({
+  barcode: '',
   name: '',
   category: '',
+  cost: 0,
   price: 0,
   stock: 0,
   minStock: settings.minStockDefault,
@@ -79,8 +83,10 @@ function openCreate() {
   selected.value = null;
   photoMeta.value = null;
   form.value = {
+    barcode: '',
     name: '',
     category: category.value !== 'ALL' ? category.value : categoriesStore.items[0]?.name ?? '',
+    cost: 0,
     price: 0,
     stock: 0,
     minStock: settings.minStockDefault,
@@ -95,8 +101,10 @@ function openEdit(p: Product) {
   selected.value = p;
   photoMeta.value = null;
   form.value = {
+    barcode: p.barcode ?? '',
     name: p.name,
     category: p.category,
+    cost: toBRLValue(p.costCents ?? 0),
     price: toBRLValue(p.priceCents),
     stock: p.stock,
     minStock: p.minStock,
@@ -135,9 +143,11 @@ async function saveCreate() {
   error.value = null;
   try {
     await productsStore.create({
+      barcode: form.value.barcode.trim() || null,
       name: form.value.name.trim(),
       category: form.value.category.trim(),
       photoUrl: form.value.photoUrl.trim() || null,
+      costCents: form.value.cost ? toCents(Number(form.value.cost)) : null,
       priceCents: toCents(Number(form.value.price)),
       stock: Number(form.value.stock),
       minStock: Number(form.value.minStock),
@@ -159,9 +169,11 @@ async function saveEdit() {
   error.value = null;
   try {
     await productsStore.update(selected.value.id, {
+      barcode: form.value.barcode.trim() || null,
       name: form.value.name.trim(),
       category: form.value.category.trim(),
       photoUrl: form.value.photoUrl.trim() || null,
+      costCents: form.value.cost ? toCents(Number(form.value.cost)) : null,
       priceCents: toCents(Number(form.value.price)),
       stock: Number(form.value.stock),
       minStock: Number(form.value.minStock),
@@ -208,6 +220,10 @@ function stockSeverity(p: Product) {
   if (p.stock <= 0) return 'danger';
   if (p.stock <= p.minStock) return 'warning';
   return 'success';
+}
+
+function goDetail(p: Product) {
+  router.push(`/admin/produtos/${p.id}`);
 }
 
 async function load() {
@@ -276,6 +292,7 @@ onMounted(load);
           tableStyle="min-width: 60rem"
         >
           <Column field="name" header="Produto" sortable style="min-width: 18rem" />
+          <Column field="barcode" header="Código de barras" sortable style="min-width: 12rem" />
           <Column field="category" header="Categoria" sortable style="min-width: 12rem" />
           <Column header="Preço" sortable sortField="priceCents" style="min-width: 10rem">
             <template #body="{ data }">
@@ -298,6 +315,7 @@ onMounted(load);
           <Column header="Ações" style="min-width: 14rem">
             <template #body="{ data }">
               <div class="flex items-center gap-2">
+                <Button icon="pi pi-info-circle" rounded severity="secondary" @click="goDetail(data)" />
                 <Button icon="pi pi-pencil" rounded severity="secondary" @click="openEdit(data)" />
                 <Button icon="pi pi-sliders-h" rounded severity="secondary" @click="openStock(data)" />
                 <Button
@@ -325,8 +343,18 @@ onMounted(load);
         </div>
 
         <div class="space-y-1">
+          <label class="text-sm font-medium text-slate-700">Código de barras (opcional)</label>
+          <InputText v-model="form.barcode" class="w-full" />
+        </div>
+
+        <div class="space-y-1">
           <label class="text-sm font-medium text-slate-700">Categoria</label>
           <InputText v-model="form.category" class="w-full" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-sm font-medium text-slate-700">Preço de custo (R$)</label>
+          <input v-model.number="form.cost" type="number" step="0.01" min="0" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm" />
         </div>
 
         <div class="space-y-1">
@@ -380,8 +408,18 @@ onMounted(load);
         </div>
 
         <div class="space-y-1">
+          <label class="text-sm font-medium text-slate-700">Código de barras (opcional)</label>
+          <InputText v-model="form.barcode" class="w-full" />
+        </div>
+
+        <div class="space-y-1">
           <label class="text-sm font-medium text-slate-700">Categoria</label>
           <InputText v-model="form.category" class="w-full" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-sm font-medium text-slate-700">Preço de custo (R$)</label>
+          <input v-model.number="form.cost" type="number" step="0.01" min="0" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm" />
         </div>
 
         <div class="space-y-1">

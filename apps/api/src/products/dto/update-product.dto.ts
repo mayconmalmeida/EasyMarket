@@ -4,6 +4,10 @@ import { ProductStatus } from '@prisma/client';
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
+  barcode?: string;
+
+  @IsOptional()
+  @IsString()
   name?: string;
 
   @IsOptional()
@@ -13,6 +17,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   photoUrl?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  costCents?: number;
 
   @IsOptional()
   @IsInt()

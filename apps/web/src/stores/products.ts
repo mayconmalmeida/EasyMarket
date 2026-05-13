@@ -3,9 +3,11 @@ import { api } from '../lib/api';
 
 export type Product = {
   id: string;
+  barcode?: string | null;
   name: string;
   category: string;
   photoUrl?: string | null;
+  costCents?: number | null;
   priceCents: number;
   stock: number;
   minStock: number;

@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Wallet,
   Package,
+  PackagePlus,
   Tags,
   Users,
   Building2,
@@ -22,6 +23,7 @@ import {
   Settings as SettingsIcon,
   Search,
   LogOut,
+  ArrowLeftRight,
 } from 'lucide-vue-next';
 
 type NavItem = {
@@ -51,6 +53,13 @@ const navGroups: NavGroup[] = [
       { label: 'Retiradas', to: '/admin/retiradas', icon: ShoppingCart },
       { label: 'Pendências', to: '/admin/pendencias', icon: AlertCircle },
       { label: 'Fechamento Mensal', to: '/admin/fechamento-mensal', icon: Wallet },
+    ],
+  },
+  {
+    label: 'Estoque',
+    items: [
+      { label: 'Entradas de Estoque', to: '/admin/entradas-estoque', icon: PackagePlus },
+      { label: 'Movimentações de Estoque', to: '/admin/movimentacoes-estoque', icon: ArrowLeftRight },
     ],
   },
   {
@@ -160,7 +169,7 @@ onBeforeUnmount(() => {
       <div class="absolute inset-0 bg-black/30" @click="mobileOpen = false" />
       <aside class="absolute left-0 top-0 h-full w-80 border-r border-[#E5E7EB] bg-white shadow-xl">
         <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-5 py-5">
-          <img :src="logoSrc" class="h-20 w-20 object-cover" :alt="settings.marketName" />
+          <img :src="logoSrc" class="h-32 w-32 object-contain" :alt="settings.marketName" />
         </div>
 
         <nav class="space-y-6 p-4">
@@ -186,7 +195,7 @@ onBeforeUnmount(() => {
       <aside class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
         <div class="flex h-full flex-col border-r border-[#E5E7EB] bg-white">
           <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
-            <img :src="logoSrc" class="h-20 w-20 object-cover" :alt="settings.marketName" />
+            <img :src="logoSrc" class="h-32 w-32 object-contain" :alt="settings.marketName" />
           </div>
 
           <nav class="flex-1 space-y-6 overflow-auto p-4">
@@ -237,6 +246,8 @@ onBeforeUnmount(() => {
               >
                 <i class="pi pi-bars" />
               </button>
+
+              <img :src="logoSrc" class="h-10 w-10 object-contain lg:hidden" :alt="settings.marketName" />
 
               <div class="flex min-w-0 items-center gap-2 text-sm text-slate-600">
                 <span class="truncate font-medium">{{ breadcrumb[0].label }}</span>

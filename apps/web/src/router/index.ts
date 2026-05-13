@@ -8,6 +8,7 @@ import CollaboratorWebLayout from '../layouts/CollaboratorWebLayout.vue';
 import AdminLoginPage from '../views/admin/AdminLoginPage.vue';
 import AdminDashboardView from '../views/admin/AdminDashboardView.vue';
 import AdminProductsView from '../views/admin/AdminProductsView.vue';
+import AdminProductDetailView from '../views/admin/AdminProductDetailView.vue';
 import AdminCategoriesView from '../views/admin/AdminCategoriesView.vue';
 import AdminCollaboratorsView from '../views/admin/AdminCollaboratorsView.vue';
 import AdminSectorsView from '../views/admin/AdminSectorsView.vue';
@@ -16,6 +17,8 @@ import AdminPendenciesView from '../views/admin/AdminPendenciesView.vue';
 import AdminMonthlyClosingView from '../views/admin/AdminMonthlyClosingView.vue';
 import AdminReportsView from '../views/admin/AdminReportsView.vue';
 import AdminSettingsView from '../views/admin/AdminSettingsView.vue';
+import AdminStockEntriesView from '../views/admin/AdminStockEntriesView.vue';
+import AdminStockMovementsView from '../views/admin/AdminStockMovementsView.vue';
 import CollaboratorHomeView from '../views/collaborator/CollaboratorHomeView.vue';
 import CollaboratorConsumptionView from '../views/collaborator/CollaboratorConsumptionView.vue';
 import CollaboratorPendenciesView from '../views/collaborator/CollaboratorPendenciesView.vue';
@@ -53,7 +56,10 @@ export const router = createRouter({
         { path: 'dashboard', component: AdminDashboardView },
         { path: 'colaboradores', component: AdminCollaboratorsView },
         { path: 'setores', component: AdminSectorsView },
+        { path: 'entradas-estoque', component: AdminStockEntriesView },
+        { path: 'movimentacoes-estoque', component: AdminStockMovementsView },
         { path: 'produtos', component: AdminProductsView },
+        { path: 'produtos/:id', component: AdminProductDetailView },
         { path: 'categorias', component: AdminCategoriesView },
         { path: 'retiradas', component: AdminWithdrawalsView },
         { path: 'pendencias', component: AdminPendenciesView },

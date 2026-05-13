@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useSettingsStore } from '../stores/settings';
@@ -25,33 +25,6 @@ onMounted(() => {
   if (props.presetCode) code.value = props.presetCode;
 });
 
-function onKeyDown(e: KeyboardEvent) {
-  if (loading.value) return;
-  if (e.key >= '0' && e.key <= '9') {
-    pushDigit(e.key);
-    return;
-  }
-  if (e.key === 'Backspace') {
-    backspace();
-    return;
-  }
-  if (e.key === 'Escape') {
-    clearPin();
-    return;
-  }
-  if (e.key === 'Enter') {
-    submit();
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', onKeyDown);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', onKeyDown);
-});
-
 const logo = computed(() => settings.logoUrl || new URL('../assets/logo.png', import.meta.url).toString());
 const isAdminLogin = computed(() => (props.title ?? '').toLowerCase().includes('admin'));
 
@@ -59,17 +32,6 @@ function isValidPin(value: string) {
   const v = value.trim();
   if (!/^\d+$/.test(v)) return false;
   return v.length === 4 || v.length === 6;
-}
-
-function pushDigit(d: string) {
-  if (loading.value) return;
-  if (pin.value.length >= 6) return;
-  pin.value = `${pin.value}${d}`;
-}
-
-function backspace() {
-  if (loading.value) return;
-  pin.value = pin.value.slice(0, -1);
 }
 
 function clearPin() {
@@ -94,8 +56,11 @@ async function submit() {
     else {
       const raw = route.query.redirect;
       const redirect = typeof raw === 'string' ? raw : '';
-      const defaultAfterLogin = route.path.startsWith('/colaborador') ? '/colaborador/inicio' : '/tablet';
-      const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('/admin') ? redirect : defaultAfterLogin;
+      const defaultAfterLogin = '/colaborador/inicio';
+      const safe =
+        redirect && redirect.startsWith('/') && !redirect.startsWith('/admin')
+          ? redirect
+          : defaultAfterLogin;
       await router.push(safe);
     }
   } catch (e: any) {
@@ -111,11 +76,11 @@ async function submit() {
     <div class="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:py-12">
       <div class="flex flex-col justify-center">
         <div class="flex items-center gap-3">
-          <img :src="logo" class="h-28 w-28 object-cover md:h-40 md:w-40" :alt="settings.marketName" />
+          <img :src="logo" class="h-40 w-40 object-contain md:h-64 md:w-64" :alt="settings.marketName" />
         </div>
         <div class="mt-8">
           <div class="text-2xl font-semibold text-[#003B8E]">{{ title ?? 'Entrar' }}</div>
-          <div class="mt-2 text-sm text-slate-600">Informe seu código e digite seu PIN.</div>
+          <div class="mt-2 text-sm text-slate-600">Acesse pelo navegador para consultar consumo, pendências e pagamentos.</div>
         </div>
       </div>
 
@@ -134,49 +99,16 @@ async function submit() {
 
           <div class="space-y-2">
             <label class="text-sm font-medium text-slate-700">PIN (4 ou 6 dígitos)</label>
-            <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4">
-              <div class="flex items-center gap-2">
-                <div
-                  v-for="idx in 6"
-                  :key="idx"
-                  class="h-3 w-3 rounded-full"
-                  :class="pin.length >= idx ? 'bg-[#003B8E]' : 'bg-slate-200'"
-                />
-              </div>
+            <div class="flex items-center gap-2">
+              <Password
+                v-model="pin"
+                class="w-full"
+                :feedback="false"
+                toggleMask
+                autocomplete="current-password"
+                inputmode="numeric"
+              />
               <Button type="button" icon="pi pi-times" rounded severity="secondary" @click="clearPin" />
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <button
-                v-for="n in 9"
-                :key="n"
-                type="button"
-                class="h-16 rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-900 shadow-sm active:scale-[0.99]"
-                @click="pushDigit(String(n))"
-              >
-                {{ n }}
-              </button>
-              <button
-                type="button"
-                class="h-16 rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm active:scale-[0.99]"
-                @click="backspace"
-              >
-                Apagar
-              </button>
-              <button
-                type="button"
-                class="h-16 rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-900 shadow-sm active:scale-[0.99]"
-                @click="pushDigit('0')"
-              >
-                0
-              </button>
-              <button
-                type="button"
-                class="h-16 rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm active:scale-[0.99]"
-                @click="clearPin"
-              >
-                Limpar
-              </button>
             </div>
           </div>
 

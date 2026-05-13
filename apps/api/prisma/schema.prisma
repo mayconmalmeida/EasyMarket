@@ -48,6 +48,18 @@ enum NotificationType {
   PAYMENT_RECORDED
 }
 
+enum StockMovementType {
+  IN
+  OUT
+  ADJUST
+}
+
+enum StockMovementSource {
+  STOCK_ENTRY
+  WITHDRAWAL
+  MANUAL_ADJUSTMENT
+}
+
 model Sector {
   id        String   @id @default(uuid())
   name      String   @unique
@@ -90,15 +102,18 @@ model User {
   closedMonths MonthlyClosing[]
   auditLogs   AuditLog[]   @relation("AuditActor")
   notifications Notification[]
+  stockMovements StockMovement[] @relation("StockMovementActor")
 
   @@index([sectorId])
 }
 
 model Product {
   id        String        @id @default(uuid())
+  barcode   String?       @unique
   name      String
   category  String
   photoUrl  String?
+  costCents Int?
   priceCents Int
   stock     Int
   minStock  Int
@@ -107,6 +122,7 @@ model Product {
   updatedAt DateTime      @updatedAt
 
   items WithdrawalItem[]
+  stockMovements StockMovement[]
 }
 
 model Category {
@@ -124,7 +140,7 @@ model Category {
 
 model AppSettings {
   id                      String   @id @default(uuid())
-  marketName              String   @default("EasyMarket")
+  marketName              String   @default("Mercadinho SINNC")
   logoUrl                 String?
   pixKey                  String   @default("")
   pixQrCodeUrl            String   @default("")
@@ -147,6 +163,7 @@ model Withdrawal {
   createdAt     DateTime      @default(now())
 
   items WithdrawalItem[]
+  stockMovements StockMovement[]
 
   @@index([monthlyClosingId])
   @@index([userId, createdAt])
@@ -160,6 +177,30 @@ model WithdrawalItem {
   product      Product    @relation(fields: [productId], references: [id])
   quantity     Int
   unitPriceCents Int
+}
+
+model StockMovement {
+  id            String             @id @default(uuid())
+  productId     String
+  product       Product            @relation(fields: [productId], references: [id])
+  type          StockMovementType
+  source        StockMovementSource
+  quantity      Int
+  unitCostCents Int?
+  unitPriceCents Int?
+  barcodeSnapshot String?
+  occurredAt    DateTime
+  note          String?
+  actorId       String
+  actor         User               @relation("StockMovementActor", fields: [actorId], references: [id])
+  withdrawalId  String?
+  withdrawal    Withdrawal?        @relation(fields: [withdrawalId], references: [id], onDelete: SetNull)
+  createdAt     DateTime           @default(now())
+
+  @@index([productId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([type, source, occurredAt])
+  @@index([withdrawalId])
 }
 
 model AuditLog {

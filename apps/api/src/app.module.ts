@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { WithdrawalsModule } from './withdrawals/withdrawals.module';
 import { SectorsModule } from './sectors/sectors.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StockModule } from './stock/stock.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     SettingsModule,
     SectorsModule,
     NotificationsModule,
+    StockModule,
   ],
   controllers: [AppController],
   providers: [AppService],

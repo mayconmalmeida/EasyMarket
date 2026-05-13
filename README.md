@@ -1,9 +1,9 @@
-# EasyMarket
+# Mercadinho SINNC
 
-Sistema completo de mercadinho interno com:
-- Totem de autoatendimento (Tablet)
+Sistema interno de mercadinho com:
+- Tablet (compra/retirada)
 - Portal Administrativo (Admin)
-- Portal do Colaborador
+- Portal do Colaborador (web no navegador)
 
 Este repositório é um monorepo (npm workspaces).
 
@@ -11,6 +11,13 @@ Este repositório é um monorepo (npm workspaces).
 
 - `apps/api`: API (NestJS + Prisma + PostgreSQL)
 - `apps/web`: Frontend (Vue 3 + Vite + Pinia + Vue Router + PrimeVue + Tailwind)
+
+## Estoque (interno)
+
+O controle de estoque é simples e focado em uso interno:
+- Entradas de Estoque (admin): registra entradas e soma automaticamente no estoque atual
+- Movimentações de Estoque (admin): entradas, saídas por retirada e ajustes manuais
+- Detalhe do produto (admin): relatórios, histórico e consumo por período
 
 ## Requisitos
 
@@ -51,6 +58,12 @@ npm run dev
 - Web: `http://localhost:5173`
 - API: `http://localhost:3000`
 
+## Acessos rápidos
+
+- Portal do Colaborador (web): `http://localhost:5173/colaborador/login`
+- Portal Administrativo: `http://localhost:5173/admin/login`
+- Tablet (compra): `http://localhost:5173/tablet`
+
 ## Scripts úteis
 
 ```bash
@@ -59,4 +72,3 @@ npm run db:migrate
 npm run db:seed
 npm run db:check
 ```
-

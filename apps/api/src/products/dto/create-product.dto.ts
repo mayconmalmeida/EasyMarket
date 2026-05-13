@@ -2,6 +2,10 @@ import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { ProductStatus } from '@prisma/client';
 
 export class CreateProductDto {
+  @IsOptional()
+  @IsString()
+  barcode?: string;
+
   @IsString()
   name!: string;
 
@@ -11,6 +15,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   photoUrl?: string;
+
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  costCents?: number;
 
   @IsInt()
   @Min(0)

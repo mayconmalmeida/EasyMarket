@@ -55,7 +55,7 @@ async function submit() {
     <div class="mx-auto grid min-h-[100vh] max-w-6xl grid-cols-1 lg:grid-cols-2">
       <div class="hidden flex-col justify-between px-10 py-12 lg:flex">
         <div class="flex items-center gap-3">
-          <img :src="logo" class="h-28 w-28 object-cover md:h-40 md:w-40" alt="EasyMarket" />
+          <img :src="logo" class="h-40 w-40 object-contain md:h-64 md:w-64" :alt="settings.marketName" />
         </div>
 
         <div class="max-w-md">
