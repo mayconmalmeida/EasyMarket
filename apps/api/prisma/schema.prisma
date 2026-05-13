@@ -140,7 +140,7 @@ model Category {
 
 model AppSettings {
   id                      String   @id @default(uuid())
-  marketName              String   @default("Mercadinho SINNC")
+  marketName              String   @default("EasyMarket")
   logoUrl                 String?
   pixKey                  String   @default("")
   pixQrCodeUrl            String   @default("")

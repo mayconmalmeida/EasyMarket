@@ -11,10 +11,10 @@ export type Settings = {
   collaboratorPortalEnabled: boolean;
 };
 
-const LS_KEY = 'mercadinho-sinnc.settings';
+const LS_KEY = 'easymarket.settings';
 
 const defaultSettings: Settings = {
-  marketName: 'Mercadinho SINNC',
+  marketName: 'EasyMarket',
   logoUrl: null,
   pixKey: '',
   pixQrCodeUrl: '',

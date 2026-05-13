@@ -33,7 +33,7 @@ async function syncFromStore() {
 
 async function save() {
   await settings.saveAdmin({
-    marketName: form.value.marketName.trim() || 'Mercadinho SINNC',
+    marketName: form.value.marketName.trim() || 'EasyMarket',
     logoUrl: form.value.logoUrl.trim() || null,
     pixKey: form.value.pixKey.trim(),
     pixQrCodeUrl: form.value.pixQrCodeUrl.trim(),

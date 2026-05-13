@@ -1,4 +1,4 @@
-# Mercadinho SINNC
+# EasyMarket
 
 Sistema interno de mercadinho com:
 - Tablet (compra/retirada)

@@ -12,7 +12,7 @@ export class SettingsService {
     });
     if (existing) return existing;
 
-    return this.prisma.appSettings.create({ data: { marketName: 'Mercadinho SINNC' } });
+    return this.prisma.appSettings.create({ data: { marketName: 'EasyMarket' } });
   }
 
   async publicSettings() {
