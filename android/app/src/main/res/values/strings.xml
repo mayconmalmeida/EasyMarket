@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EasyMarket Tablet</string>
+    <string name="title_activity_main">EasyMarket Tablet</string>
+    <string name="package_name">com.easymarket.tablet</string>
+    <string name="custom_url_scheme">com.easymarket.tablet</string>
+</resources>

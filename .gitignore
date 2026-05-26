@@ -6,6 +6,13 @@ dist
 build
 coverage
 
+android/.gradle
+android/.idea
+android/local.properties
+android/**/build
+android/**/.cxx
+android/**/.externalNativeBuild
+
 .DS_Store
 
 npm-debug.log*

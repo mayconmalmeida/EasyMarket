@@ -64,6 +64,34 @@ npm run dev
 - Portal Administrativo: `http://localhost:5173/admin/login`
 - Tablet (compra): `http://localhost:5173/tablet`
 
+## APK do Tablet (Android)
+
+O APK do tablet é um app Android (Capacitor) que abre a URL do tablet do seu servidor.
+
+- URL atual configurada em `capacitor.config.ts`: `http://192.168.3.3:5173/tablet`
+- Para trocar a URL antes de gerar o APK, altere `server.url` nesse arquivo.
+
+### Requisitos
+
+- Android Studio + Android SDK instalados
+- Java 17+
+
+### Gerar APK (debug)
+
+```bash
+npm run tablet:android:sync
+npm run tablet:android:apk:debug
+```
+
+Se aparecer erro de SDK, crie o arquivo `android/local.properties` com o caminho do SDK:
+
+```text
+sdk.dir=C:\\Users\\SEU_USUARIO\\AppData\\Local\\Android\\Sdk
+```
+
+O APK gerado fica em:
+`android/app/build/outputs/apk/debug/app-debug.apk`
+
 ## Scripts úteis
 
 ```bash
