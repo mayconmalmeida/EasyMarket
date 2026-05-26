@@ -75,7 +75,10 @@ router.beforeEach(async (to) => {
   const auth = useAuthStore();
   const settings = useSettingsStore();
   if ((to.path === '/me' || to.path.startsWith('/colaborador') || to.path === '/tablet') && !settings.loaded && !settings.loading) {
-    await settings.loadPublic();
+    try {
+      await settings.loadPublic();
+    } catch {
+    }
   }
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     if (to.meta.role === 'ADMIN') return '/admin/login';
@@ -86,6 +89,10 @@ router.beforeEach(async (to) => {
   if (to.path.startsWith('/colaborador') && auth.isAdmin) return '/admin';
   if ((to.path === '/login' || to.path === '/admin/login' || to.path === '/colaborador/login') && auth.isAuthenticated)
     return auth.isAdmin ? '/admin' : '/colaborador/inicio';
-  if (!settings.collaboratorPortalEnabled && (to.path === '/me' || to.path.startsWith('/colaborador'))) return '/tablet';
+  if (
+    !settings.collaboratorPortalEnabled &&
+    (to.path === '/me' || (to.path.startsWith('/colaborador') && to.path !== '/colaborador/login'))
+  )
+    return '/tablet';
   return true;
 });

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL ?? `${window.location.protocol}//${window.location.hostname}:3000`,
 });
 
 api.interceptors.request.use((config) => {
@@ -28,7 +28,8 @@ api.interceptors.response.use(
       localStorage.removeItem('easymarket.refreshToken');
       localStorage.removeItem('easymarket.user');
       const p = window.location.pathname;
-      window.location.href = p.startsWith('/admin') ? '/admin/login' : '/colaborador/login';
+      const target = p.startsWith('/admin') ? '/admin/login' : '/colaborador/login';
+      if (p !== target) window.location.href = target;
     }
     return Promise.reject(error);
   },
