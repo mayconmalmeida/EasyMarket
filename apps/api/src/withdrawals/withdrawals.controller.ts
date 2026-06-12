@@ -5,14 +5,18 @@ import {
   Param,
   Patch,
   Post,
+  Res,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
+import type { Response } from 'express';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import type { AuthUser } from '../auth/auth.types';
+import { AttachPixProofDto } from './dto/attach-pix-proof.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 import { SetPaymentStatusDto } from './dto/set-payment-status.dto';
 import { WithdrawalsService } from './withdrawals.service';
@@ -43,11 +47,36 @@ export class WithdrawalsController {
     return this.withdrawals.listPendingMine(user.id);
   }
 
+  @Post('withdrawals/:id/pix-proof')
+  attachPixProof(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: AttachPixProofDto,
+  ) {
+    return this.withdrawals.attachPixProof(user.id, id, dto);
+  }
+
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get('admin/withdrawals')
   listAll() {
     return this.withdrawals.listAll();
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('admin/withdrawals/:id/pix-proof')
+  async downloadPixProofAdmin(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const proof = await this.withdrawals.getPixProofAdmin(id);
+    res.setHeader('Content-Type', proof.mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(proof.fileName)}"`,
+    );
+    return new StreamableFile(proof.stream);
   }
 
   @UseGuards(RolesGuard)

@@ -159,24 +159,24 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-slate-900">Retiradas</div>
         <div class="text-sm text-slate-600">Histórico de compras e auditoria.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Atualizar" severity="secondary" :loading="store.loading" @click="load" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Atualizar" severity="secondary" class="w-full sm:w-auto" :loading="store.loading" @click="load" />
       </div>
     </div>
 
     <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm xl:col-span-1">
         <div class="text-sm font-semibold text-slate-900">Filtros</div>
         <div class="mt-1 text-sm text-slate-600">Refine o histórico.</div>
-        <div class="mt-3 space-y-3">
+        <div class="mt-3 grid grid-cols-1 gap-2.5">
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-600">Período (de)</label>
             <input v-model="from" type="date" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm" />
@@ -200,12 +200,12 @@ onMounted(load);
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm lg:col-span-3">
-        <DataTable :value="filtered" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines tableStyle="min-width: 70rem">
-          <Column header="Data/Hora" sortable field="createdAt" style="min-width: 14rem">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-sm xl:col-span-4">
+        <DataTable :value="filtered" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines tableStyle="min-width: 100%">
+          <Column header="Data/Hora" sortable field="createdAt" style="min-width: 10.5rem">
             <template #body="{ data }">{{ new Date(data.createdAt).toLocaleString('pt-BR') }}</template>
           </Column>
-          <Column header="Colaborador" style="min-width: 16rem">
+          <Column header="Colaborador" style="min-width: 12rem">
             <template #body="{ data }">
               <div>
                 <div class="font-semibold text-text">{{ data.user.name }}</div>
@@ -213,7 +213,7 @@ onMounted(load);
               </div>
             </template>
           </Column>
-          <Column header="Produtos" style="min-width: 16rem">
+          <Column header="Produtos" style="min-width: 11rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell">
             <template #body="{ data }">
               <div class="text-sm text-slate-700">{{ data.items.length }} itens</div>
               <div class="text-xs text-slate-500 truncate">
@@ -222,28 +222,29 @@ onMounted(load);
               </div>
             </template>
           </Column>
-          <Column header="Pagamento" sortable field="paymentMethod" style="min-width: 12rem">
+          <Column header="Pagamento" sortable field="paymentMethod" style="min-width: 8rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
             <template #body="{ data }">{{ methodLabel(data) }}</template>
           </Column>
-          <Column header="Status" sortable field="paymentStatus" style="min-width: 10rem">
+          <Column header="Status" sortable field="paymentStatus" style="min-width: 8rem">
             <template #body="{ data }">
               <Tag :value="statusLabel(data)" :severity="statusSeverity(data)" />
             </template>
           </Column>
-          <Column header="Total" sortable field="totalCents" style="min-width: 10rem">
+          <Column header="Total" sortable field="totalCents" style="min-width: 8rem">
             <template #body="{ data }">
               <div class="text-right font-semibold text-[#003B8E]">{{ formatBRL(data.totalCents) }}</div>
             </template>
           </Column>
-          <Column header="Ações" style="min-width: 14rem">
+          <Column header="Ações" style="min-width: 8rem">
             <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <Button icon="pi pi-search" rounded severity="secondary" @click="openDetails(data)" />
-                <Button icon="pi pi-print" rounded severity="secondary" @click="printReceipt(data)" />
+              <div class="flex flex-wrap items-center gap-1.5">
+                <Button icon="pi pi-search" rounded severity="secondary" size="small" @click="openDetails(data)" />
+                <Button icon="pi pi-print" rounded severity="secondary" size="small" @click="printReceipt(data)" />
                 <Button
                   v-if="data.paymentStatus === 'PENDING'"
                   icon="pi pi-check"
                   rounded
+                  size="small"
                   @click="markPaid(data)"
                 />
               </div>
@@ -256,29 +257,29 @@ onMounted(load);
       </div>
     </div>
 
-    <Dialog v-model:visible="detailsOpen" modal header="Detalhes da retirada" :style="{ width: '46rem' }" :draggable="false">
-      <div v-if="selected" class="space-y-4">
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <div class="rounded-2xl bg-[#F5F7FB] p-4">
+    <Dialog v-model:visible="detailsOpen" modal header="Detalhes da retirada" :style="{ width: 'min(52rem, 96vw)' }" :draggable="false">
+      <div v-if="selected" class="space-y-3">
+        <div class="grid grid-cols-1 gap-2.5 md:grid-cols-2">
+          <div class="rounded-2xl bg-[#F5F7FB] p-3">
             <div class="text-xs text-slate-500">ID</div>
             <div class="break-all text-sm font-semibold text-slate-900">{{ selected.id }}</div>
           </div>
-          <div class="rounded-2xl bg-[#F5F7FB] p-4">
+          <div class="rounded-2xl bg-[#F5F7FB] p-3">
             <div class="text-xs text-slate-500">Data/Hora</div>
             <div class="text-sm font-semibold text-slate-900">{{ new Date(selected.createdAt).toLocaleString('pt-BR') }}</div>
           </div>
-          <div class="rounded-2xl bg-[#F5F7FB] p-4">
+          <div class="rounded-2xl bg-[#F5F7FB] p-3">
             <div class="text-xs text-slate-500">Colaborador</div>
             <div class="text-sm font-semibold text-slate-900">{{ selected.user.name }} ({{ selected.user.code }})</div>
           </div>
-          <div class="rounded-2xl bg-[#F5F7FB] p-4">
+          <div class="rounded-2xl bg-[#F5F7FB] p-3">
             <div class="text-xs text-slate-500">Pagamento</div>
             <div class="text-sm font-semibold text-slate-900">{{ methodLabel(selected) }} • {{ statusLabel(selected) }}</div>
           </div>
         </div>
 
-        <div class="overflow-hidden rounded-2xl border border-[#E5E7EB]">
-          <table class="w-full text-left text-sm">
+        <div class="overflow-x-auto rounded-2xl border border-[#E5E7EB]">
+          <table class="w-full min-w-[28rem] text-left text-sm">
             <thead class="bg-[#F5F7FB] text-xs text-slate-600">
               <tr>
                 <th class="px-3 py-2">Produto</th>
@@ -296,10 +297,10 @@ onMounted(load);
           </table>
         </div>
 
-        <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5">
+        <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4">
           <div class="text-sm font-semibold text-slate-900">Corrigir pagamento</div>
           <div class="mt-1 text-sm text-slate-600">Ajuste manual do status para auditoria.</div>
-          <div class="mt-3 flex flex-col gap-3 md:flex-row md:items-end">
+          <div class="mt-3 flex flex-col gap-2.5 md:flex-row md:items-end">
             <div class="flex-1 space-y-1">
               <label class="text-xs font-medium text-slate-600">Status</label>
               <select v-model="paymentStatusEdit" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm">
@@ -308,19 +309,19 @@ onMounted(load);
                 <option value="PENDING">Pendente</option>
               </select>
             </div>
-            <div class="md:w-44">
+            <div class="md:w-40">
               <Button class="w-full" label="Salvar status" :loading="savingStatus" @click="savePaymentStatus" />
             </div>
           </div>
         </div>
 
-        <div class="flex items-center justify-between rounded-2xl bg-[#F5F7FB] p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-[#F5F7FB] p-4">
           <div class="text-sm text-slate-600">Total</div>
           <div class="text-lg font-bold text-[#003B8E]">{{ formatBRL(selected.totalCents) }}</div>
         </div>
       </div>
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
           <Button label="Fechar" severity="secondary" @click="detailsOpen = false" />
         </div>
       </template>

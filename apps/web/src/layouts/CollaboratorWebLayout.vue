@@ -120,15 +120,22 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="admin-saas min-h-full bg-[#F5F7FB] text-[#1F2937]">
-    <div v-if="mobileOpen" class="fixed inset-0 z-40 lg:hidden">
+  <div class="collab-wallet min-h-full bg-[#F5F7FB] text-[#1F2937]">
+    <div class="pointer-events-none fixed inset-0">
+      <div class="absolute left-[-10rem] top-[-10rem] h-96 w-96 rounded-full bg-[#EAF3FF] blur-3xl" />
+      <div class="absolute bottom-[-12rem] right-[-10rem] h-[28rem] w-[28rem] rounded-full bg-[#DCEBFF] blur-3xl" />
+      <div class="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.85),rgba(245,247,251,0.55))]" />
+    </div>
+
+    <div class="relative">
+    <div v-if="mobileOpen" class="fixed inset-0 z-40 xl:hidden">
       <div class="absolute inset-0 bg-black/30" @click="mobileOpen = false" />
-      <aside class="absolute left-0 top-0 h-full w-80 border-r border-[#E5E7EB] bg-white shadow-xl">
-        <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
-          <img :src="logoSrc" class="h-32 w-32 object-contain" :alt="settings.marketName" />
+      <aside class="absolute left-0 top-0 flex h-full w-[min(20rem,88vw)] flex-col border-r border-[#E5E7EB] bg-white shadow-xl">
+        <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-4">
+          <img :src="logoSrc" class="h-20 w-20 object-contain sm:h-24 sm:w-24" :alt="settings.marketName" />
         </div>
 
-        <nav class="p-4">
+        <nav class="flex-1 overflow-y-auto p-4">
           <div class="px-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Menu</div>
           <div class="mt-2 space-y-1">
             <RouterLink
@@ -172,10 +179,10 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="flex">
-      <aside class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
-        <div class="flex h-full flex-col border-r border-[#E5E7EB] bg-white">
-          <div class="flex items-center gap-3 border-b border-[#E5E7EB] px-6 py-5">
-            <img :src="logoSrc" class="h-32 w-32 object-contain" :alt="settings.marketName" />
+      <aside class="hidden xl:fixed xl:inset-y-0 xl:flex xl:w-72 2xl:w-80 xl:flex-col">
+        <div class="flex h-full flex-col border-r border-[#E5E7EB] bg-white/90 backdrop-blur">
+          <div class="flex items-center gap-3 border-b border-[#E5E7EB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] px-6 py-4">
+            <img :src="logoSrc" class="h-20 w-20 object-contain 2xl:h-24 2xl:w-24" :alt="settings.marketName" />
           </div>
 
           <nav class="flex-1 overflow-auto p-4">
@@ -185,8 +192,12 @@ onBeforeUnmount(() => {
                 v-for="i in items"
                 :key="i.to"
                 :to="i.to"
-                class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
-                :class="isActive(i.to) ? 'bg-[#EAF3FF] text-[#003B8E]' : 'text-slate-700 hover:bg-slate-50'"
+                class="group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all duration-200"
+                :class="
+                  isActive(i.to)
+                    ? 'bg-[linear-gradient(135deg,#EAF3FF_0%,#F8FBFF_100%)] text-[#003B8E] shadow-[0_12px_28px_rgba(0,87,217,0.10)] ring-1 ring-[#D7E6FF]'
+                    : 'text-slate-700 hover:bg-slate-50'
+                "
               >
                 <component :is="i.icon" class="h-4 w-4" />
                 <span class="truncate">{{ i.label }}</span>
@@ -195,7 +206,7 @@ onBeforeUnmount(() => {
           </nav>
 
           <div class="border-t border-[#E5E7EB] p-4">
-            <div class="rounded-2xl bg-[#F5F7FB] p-4">
+            <div class="rounded-3xl border border-[#E5E7EB] bg-[linear-gradient(135deg,#FFFFFF_0%,#F8FBFF_100%)] p-4 shadow-sm">
               <div class="flex items-center justify-between">
                 <div>
                   <div class="text-xs font-medium text-slate-600">Saldo pendente</div>
@@ -219,7 +230,7 @@ onBeforeUnmount(() => {
               </div>
               <button
                 type="button"
-                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E5E7EB] bg-white text-slate-700 hover:bg-slate-50"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E5E7EB] bg-white text-slate-700 transition-all duration-200 hover:-translate-y-[1px] hover:bg-slate-50 hover:text-[#003B8E]"
                 @click="logout"
               >
                 <LogOut class="h-4 w-4" />
@@ -229,28 +240,31 @@ onBeforeUnmount(() => {
         </div>
       </aside>
 
-      <div class="flex-1 lg:pl-80">
+      <div class="flex-1 xl:pl-72 2xl:pl-80">
         <header class="sticky top-0 z-30 border-b border-[#E5E7EB] bg-white/90 backdrop-blur">
-          <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+          <div class="mx-auto flex max-w-[1520px] items-center justify-between gap-3 px-4 py-3 sm:px-5 xl:px-6">
             <div class="flex min-w-0 items-center gap-3">
               <button
                 type="button"
-                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E5E7EB] bg-white text-slate-700 hover:bg-slate-50 lg:hidden"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#E5E7EB] bg-white text-slate-700 hover:bg-slate-50 xl:hidden"
                 @click="mobileOpen = true"
               >
                 <i class="pi pi-bars" />
               </button>
 
-              <img :src="logoSrc" class="h-10 w-10 object-contain lg:hidden" :alt="settings.marketName" />
+              <img :src="logoSrc" class="h-10 w-10 object-contain xl:hidden" :alt="settings.marketName" />
 
-              <div class="flex min-w-0 items-center gap-2 text-sm text-slate-600">
-                <span class="truncate font-medium">{{ breadcrumb[0].label }}</span>
-                <ChevronRight class="h-4 w-4 text-slate-400" />
-                <span class="truncate font-semibold text-slate-900">{{ breadcrumb[1].label }}</span>
+              <div class="min-w-0">
+                <div class="flex min-w-0 items-center gap-2 text-sm text-slate-600">
+                  <span class="truncate font-medium">{{ breadcrumb[0].label }}</span>
+                  <ChevronRight class="h-4 w-4 text-slate-400" />
+                  <span class="truncate font-semibold text-slate-900">{{ breadcrumb[1].label }}</span>
+                </div>
+                <div class="mt-1 hidden truncate text-xs text-slate-500 md:block">Seu extrato pessoal do mercadinho</div>
               </div>
             </div>
 
-            <div class="hidden w-full max-w-xl lg:block">
+            <div class="hidden w-full max-w-lg xl:block">
               <div class="relative">
                 <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <InputText v-model="query" class="w-full pl-10" placeholder="Buscar módulos..." />
@@ -273,7 +287,7 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="flex items-center gap-2">
-              <div class="hidden items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-white px-3 py-2 lg:flex">
+              <div class="hidden items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-white px-3 py-2 xl:flex">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#EAF3FF] text-xs font-semibold text-[#003B8E]">
                   {{ avatarInitials }}
                 </div>
@@ -297,7 +311,7 @@ onBeforeUnmount(() => {
                 </span>
               </button>
 
-              <OverlayPanel ref="notifPanel" :dismissable="true" class="w-[24rem]">
+              <OverlayPanel ref="notifPanel" :dismissable="true" class="w-[min(24rem,calc(100vw-1rem))]">
                 <div class="space-y-3">
                   <div class="flex items-center justify-between gap-3">
                     <div class="min-w-0">
@@ -342,13 +356,13 @@ onBeforeUnmount(() => {
                 </div>
               </OverlayPanel>
 
-              <div class="hidden rounded-2xl bg-[#EAF3FF] px-3 py-2 text-xs font-semibold text-[#003B8E] lg:block">
+              <div class="hidden rounded-2xl bg-[#EAF3FF] px-3 py-2 text-xs font-semibold text-[#003B8E] xl:block">
                 {{ nowLabel }}
               </div>
             </div>
           </div>
 
-          <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 pb-4 lg:hidden">
+          <div class="mx-auto flex max-w-[1520px] items-center justify-between gap-3 px-4 pb-3 sm:px-5 xl:hidden">
             <div class="relative w-full">
               <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <InputText v-model="query" class="w-full pl-10" placeholder="Buscar módulos..." />
@@ -371,14 +385,32 @@ onBeforeUnmount(() => {
           </div>
         </header>
 
-        <main class="mx-auto max-w-7xl px-6 py-6">
-          <div class="mb-6">
-            <div class="text-2xl font-semibold tracking-tight text-slate-900">{{ title }}</div>
-            <div class="mt-1 text-sm text-slate-600">Acompanhe consumo, pendências e pagamentos.</div>
-          </div>
+        <main class="mx-auto max-w-[1520px] px-4 py-4 sm:px-5 xl:px-6 pb-24 md:pb-28 xl:pb-6">
           <RouterView />
         </main>
       </div>
+    </div>
+
+    <nav class="safe-bottom fixed bottom-0 left-0 right-0 z-40 border-t border-[#E5E7EB] bg-white/95 backdrop-blur xl:hidden">
+      <div class="mx-auto flex max-w-[1520px] items-center justify-around px-2 py-2">
+        <RouterLink
+          v-for="i in items"
+          :key="i.to"
+          :to="i.to"
+          class="flex w-full flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-colors"
+          :class="isActive(i.to) ? 'text-[#003B8E]' : 'text-slate-500'"
+          @click="mobileOpen = false"
+        >
+          <span
+            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition-all"
+            :class="isActive(i.to) ? 'bg-[#EAF3FF] text-[#0057D9]' : 'bg-transparent text-slate-500'"
+          >
+            <component :is="i.icon" class="h-5 w-5" />
+          </span>
+          <span class="truncate">{{ i.label }}</span>
+        </RouterLink>
+      </div>
+    </nav>
     </div>
   </div>
 </template>

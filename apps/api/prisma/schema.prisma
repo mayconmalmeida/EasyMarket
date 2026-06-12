@@ -118,6 +118,7 @@ model Product {
   stock     Int
   minStock  Int
   status    ProductStatus @default(ACTIVE)
+  hideOnTablet Boolean    @default(false)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
@@ -160,6 +161,10 @@ model Withdrawal {
   totalCents    Int
   paymentMethod PaymentMethod
   paymentStatus PaymentStatus
+  pixProofFileName String?
+  pixProofMimeType String?
+  pixProofPath     String?
+  pixProofUploadedAt DateTime?
   createdAt     DateTime      @default(now())
 
   items WithdrawalItem[]

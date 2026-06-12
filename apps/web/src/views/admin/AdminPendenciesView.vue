@@ -65,39 +65,39 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-slate-900">Pendências</div>
         <div class="text-sm text-slate-600">Controle de pagamentos pendentes.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Atualizar" severity="secondary" :loading="store.loading" @click="load" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Atualizar" severity="secondary" class="w-full sm:w-auto" :loading="store.loading" @click="load" />
       </div>
     </div>
 
     <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Total pendente</div>
         <div class="mt-1 text-2xl font-bold text-status-pending">{{ formatBRL(totalPending) }}</div>
       </div>
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Colaboradores com pendência</div>
         <div class="mt-1 text-2xl font-bold text-[#003B8E]">{{ pendingUsersCount }}</div>
       </div>
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Retiradas pendentes</div>
         <div class="mt-1 text-2xl font-bold text-[#003B8E]">{{ pendingWithdrawalsCount }}</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm xl:col-span-1">
         <div class="text-sm font-semibold text-slate-900">Filtros</div>
         <div class="mt-1 text-sm text-slate-600">Refine a listagem.</div>
-        <div class="mt-3 space-y-3">
+        <div class="mt-3 grid grid-cols-1 gap-2.5">
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-600">Colaborador</label>
             <Dropdown v-model="collaborator" class="w-full" :options="collaborators" optionLabel="label" optionValue="value" />
@@ -113,12 +113,12 @@ onMounted(load);
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm lg:col-span-3">
-        <DataTable :value="filtered" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines tableStyle="min-width: 60rem">
-          <Column header="Data/Hora" sortable field="createdAt" style="min-width: 14rem">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-sm xl:col-span-4">
+        <DataTable :value="filtered" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines tableStyle="min-width: 100%">
+          <Column header="Data/Hora" sortable field="createdAt" style="min-width: 10.5rem">
             <template #body="{ data }">{{ new Date(data.createdAt).toLocaleString('pt-BR') }}</template>
           </Column>
-          <Column header="Colaborador" style="min-width: 16rem">
+          <Column header="Colaborador" style="min-width: 12rem">
             <template #body="{ data }">
               <div>
                 <div class="font-semibold text-slate-900">{{ data.user.name }}</div>
@@ -126,22 +126,22 @@ onMounted(load);
               </div>
             </template>
           </Column>
-          <Column header="Pagamento" style="min-width: 12rem">
+          <Column header="Pagamento" style="min-width: 8rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
             <template #body="{ data }">{{ methodLabel(data) }}</template>
           </Column>
-          <Column header="Total" sortable field="totalCents" style="min-width: 10rem">
+          <Column header="Total" sortable field="totalCents" style="min-width: 8rem">
             <template #body="{ data }">
               <div class="text-right font-semibold text-[#003B8E]">{{ formatBRL(data.totalCents) }}</div>
             </template>
           </Column>
-          <Column header="Status" style="min-width: 10rem">
+          <Column header="Status" style="min-width: 8rem">
             <template #body>
               <Tag value="Pendente" severity="warning" />
             </template>
           </Column>
-          <Column header="Ações" style="min-width: 10rem">
+          <Column header="Ações" style="min-width: 9rem">
             <template #body="{ data }">
-              <Button label="Marcar como pago" @click="markPaid(data)" />
+              <Button label="Marcar como pago" size="small" class="w-full sm:w-auto" @click="markPaid(data)" />
             </template>
           </Column>
           <template #empty>

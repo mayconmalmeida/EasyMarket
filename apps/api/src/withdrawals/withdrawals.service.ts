@@ -4,6 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { createReadStream } from 'node:fs';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   PaymentMethod,
   PaymentStatus,
@@ -11,8 +14,10 @@ import {
   ProductStatus,
   UserStatus,
 } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { AttachPixProofDto } from './dto/attach-pix-proof.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto';
 
 @Injectable()
@@ -95,6 +100,91 @@ export class WithdrawalsService {
     });
 
     return created;
+  }
+
+  private dataDir() {
+    return path.resolve(process.cwd(), '..', '..', 'data');
+  }
+
+  private pixProofDir(withdrawalId: string) {
+    return path.join(this.dataDir(), 'pix-proofs', withdrawalId);
+  }
+
+  private sanitizeFileName(fileName: string) {
+    return fileName
+      .trim()
+      .replace(/[^\w.\-() ]+/g, '_')
+      .replace(/\s+/g, ' ')
+      .slice(0, 120);
+  }
+
+  private decodeBase64(input: string) {
+    const raw = input.trim();
+    const base64 = raw.includes('base64,') ? raw.split('base64,').pop() ?? '' : raw;
+    try {
+      return Buffer.from(base64, 'base64');
+    } catch {
+      return null;
+    }
+  }
+
+  async attachPixProof(userId: string, withdrawalId: string, dto: AttachPixProofDto) {
+    const withdrawal = await this.prisma.withdrawal.findUnique({
+      where: { id: withdrawalId },
+    });
+    if (!withdrawal) throw new NotFoundException('Retirada não encontrada');
+    if (withdrawal.userId !== userId)
+      throw new ForbiddenException('Acesso negado');
+
+    const fileName = this.sanitizeFileName(dto.fileName || 'comprovante');
+    const mimeType = (dto.mimeType || '').trim();
+    if (!mimeType) throw new BadRequestException('Tipo de arquivo inválido');
+
+    const buf = this.decodeBase64(dto.base64);
+    if (!buf || !buf.length) throw new BadRequestException('Arquivo inválido');
+    const maxBytes = 5 * 1024 * 1024;
+    if (buf.length > maxBytes)
+      throw new BadRequestException('Arquivo muito grande (máx. 5MB)');
+
+    const dir = this.pixProofDir(withdrawalId);
+    await fs.mkdir(dir, { recursive: true });
+
+    const storedName = `${Date.now()}-${randomUUID()}-${fileName}`;
+    const absPath = path.join(dir, storedName);
+    await fs.writeFile(absPath, buf);
+
+    const relPath = path.join('pix-proofs', withdrawalId, storedName).replace(/\\/g, '/');
+
+    const updated = await this.prisma.withdrawal.update({
+      where: { id: withdrawalId },
+      data: {
+        pixProofFileName: fileName,
+        pixProofMimeType: mimeType,
+        pixProofPath: relPath,
+        pixProofUploadedAt: new Date(),
+      },
+    });
+
+    return updated;
+  }
+
+  async getPixProofAdmin(withdrawalId: string) {
+    const w = await this.prisma.withdrawal.findUnique({
+      where: { id: withdrawalId },
+      select: { pixProofFileName: true, pixProofMimeType: true, pixProofPath: true },
+    });
+    if (!w) throw new NotFoundException('Retirada não encontrada');
+    if (!w.pixProofPath || !w.pixProofMimeType)
+      throw new NotFoundException('Comprovante não encontrado');
+    if (!w.pixProofPath.startsWith('pix-proofs/'))
+      throw new NotFoundException('Comprovante não encontrado');
+
+    const abs = path.resolve(this.dataDir(), w.pixProofPath);
+    return {
+      fileName: w.pixProofFileName ?? 'comprovante',
+      mimeType: w.pixProofMimeType,
+      stream: createReadStream(abs),
+    };
   }
 
   async confirmPix(userId: string, withdrawalId: string) {

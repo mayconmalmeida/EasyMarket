@@ -18,6 +18,30 @@ export class CategoriesService {
     });
   }
 
+  listActive() {
+    return this.prisma.category
+      .findMany({
+      where: {
+        status: CategoryStatus.ACTIVE,
+        NOT: [
+          { name: { equals: 'Outros', mode: 'insensitive' } },
+          { name: { equals: 'Snacks', mode: 'insensitive' } },
+        ],
+      },
+      orderBy: [{ name: 'asc' }],
+      })
+      .then((items) => {
+        const seen = new Set<string>();
+        return items.filter((c) => {
+          const key = c.name.trim().toLowerCase();
+          if (!key) return false;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      });
+  }
+
   async create(dto: CreateCategoryDto) {
     const name = dto.name.trim();
     if (!name) throw new BadRequestException('Nome inválido');

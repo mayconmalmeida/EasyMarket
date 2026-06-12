@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { ProductStatus } from '@prisma/client';
 
 export class UpdateProductDto {
@@ -41,4 +41,8 @@ export class UpdateProductDto {
   @IsOptional()
   @IsEnum(ProductStatus)
   status?: ProductStatus;
+
+  @IsOptional()
+  @IsBoolean()
+  hideOnTablet?: boolean;
 }

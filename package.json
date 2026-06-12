@@ -12,6 +12,7 @@
     "tablet:android:sync": "npm run -w @easymarket/web build && npx cap sync android",
     "tablet:android:open": "npx cap open android",
     "tablet:android:apk:debug": "cd android && gradlew.bat assembleDebug",
+    "tablet:android:apk:release": "cd android && gradlew.bat assembleRelease",
     "db:migrate": "npm run -w @easymarket/api prisma:migrate",
     "db:seed": "npm run -w @easymarket/api prisma:seed",
     "db:setup": "npm run setup:env && npm run db:migrate && npm run db:seed",

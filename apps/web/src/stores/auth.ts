@@ -22,12 +22,21 @@ const LS_ACCESS = 'easymarket.accessToken';
 const LS_REFRESH = 'easymarket.refreshToken';
 const LS_USER = 'easymarket.user';
 
+function readStored(key: string) {
+  return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+}
+
+function clearStored(key: string) {
+  localStorage.removeItem(key);
+  sessionStorage.removeItem(key);
+}
+
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    accessToken: localStorage.getItem(LS_ACCESS),
-    refreshToken: localStorage.getItem(LS_REFRESH),
+    accessToken: readStored(LS_ACCESS),
+    refreshToken: readStored(LS_REFRESH),
     user: (() => {
-      const raw = localStorage.getItem(LS_USER);
+      const raw = readStored(LS_USER);
       return raw ? (JSON.parse(raw) as AuthUser) : null;
     })(),
   }),
@@ -36,14 +45,18 @@ export const useAuthStore = defineStore('auth', {
     isAdmin: (s) => s.user?.role === 'ADMIN',
   },
   actions: {
-    async login(code: string, pin: string) {
+    async login(code: string, pin: string, remember = true) {
       const { data } = await api.post('/auth/login', { code, pin });
       this.accessToken = data.accessToken;
       this.refreshToken = data.refreshToken;
       this.user = data.user;
-      localStorage.setItem(LS_ACCESS, this.accessToken ?? '');
-      localStorage.setItem(LS_REFRESH, this.refreshToken ?? '');
-      localStorage.setItem(LS_USER, JSON.stringify(this.user));
+      clearStored(LS_ACCESS);
+      clearStored(LS_REFRESH);
+      clearStored(LS_USER);
+      const storage = remember ? localStorage : sessionStorage;
+      storage.setItem(LS_ACCESS, this.accessToken ?? '');
+      storage.setItem(LS_REFRESH, this.refreshToken ?? '');
+      storage.setItem(LS_USER, JSON.stringify(this.user));
     },
     async logout() {
       try {
@@ -52,9 +65,9 @@ export const useAuthStore = defineStore('auth', {
         this.accessToken = null;
         this.refreshToken = null;
         this.user = null;
-        localStorage.removeItem(LS_ACCESS);
-        localStorage.removeItem(LS_REFRESH);
-        localStorage.removeItem(LS_USER);
+        clearStored(LS_ACCESS);
+        clearStored(LS_REFRESH);
+        clearStored(LS_USER);
       }
     },
   },

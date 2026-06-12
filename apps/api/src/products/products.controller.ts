@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Patch,
   Post,
@@ -43,5 +44,12 @@ export class ProductsController {
     @Body() dto: UpdateProductDto,
   ) {
     return this.products.update(id, user.id, dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.products.remove(id);
   }
 }

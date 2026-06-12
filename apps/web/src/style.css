@@ -13,6 +13,7 @@ body {
   font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
   color: #1f2937;
   background: #eaf3ff;
+  overflow-x: hidden;
 }
 
 :root {
@@ -20,6 +21,48 @@ body {
   --brand-blue-dark: #003b8e;
   --brand-blue-light: #eaf3ff;
   --brand-text: #1f2937;
+  --brand-muted: #64748b;
+  --brand-success: #16a34a;
+  --brand-warning: #f59e0b;
+  --brand-danger: #dc2626;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --app-dvh: 100dvh;
+}
+
+@supports not (height: 100dvh) {
+  :root {
+    --app-dvh: 100vh;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+.min-h-app {
+  min-height: var(--app-dvh);
+}
+
+.h-app {
+  height: var(--app-dvh);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-bottom);
+}
+
+.safe-top {
+  padding-top: var(--safe-top);
 }
 
 .p-component {
@@ -29,11 +72,20 @@ body {
 .p-inputtext {
   color: var(--brand-text);
   border-radius: 0.75rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .p-button {
   border-radius: 0.75rem;
   font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .p-button:not(.p-button-secondary) {
@@ -46,16 +98,266 @@ body {
   border-color: var(--brand-blue-dark);
 }
 
+.p-dialog {
+  max-width: min(96vw, 64rem);
+}
+
+.p-dialog .p-dialog-content {
+  overflow-wrap: anywhere;
+}
+
+.p-overlaypanel {
+  max-width: calc(100vw - 1rem);
+}
+
+.p-datatable-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .admin-saas .p-inputtext {
   border-radius: 0.75rem;
   padding-top: 0.55rem;
   padding-bottom: 0.55rem;
+  border-color: #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .admin-saas .p-button {
   border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.admin-saas .p-button:hover {
+  transform: translateY(-1px);
+}
+
+.admin-saas .p-inputtext:enabled:hover {
+  border-color: #cbd5e1;
+}
+
+.admin-saas .p-inputtext:enabled:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 4px rgba(0, 87, 217, 0.1);
+}
+
+.admin-operational .p-inputtext,
+.admin-operational .p-dropdown,
+.admin-operational .p-password-input,
+.admin-operational input:not([type='checkbox']):not([type='color']),
+.admin-operational select,
+.admin-operational textarea {
+  min-height: 2.5rem;
+}
+
+.admin-operational .p-inputtext,
+.admin-operational .p-dropdown,
+.admin-operational .p-password-input,
+.admin-operational input:not([type='checkbox']):not([type='color']),
+.admin-operational select,
+.admin-operational textarea {
+  border-color: #e2e8f0;
+}
+
+.admin-operational .p-dropdown-label,
+.admin-operational .p-inputtext,
+.admin-operational .p-password-input {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.admin-operational .p-datatable-table {
+  width: 100%;
+}
+
+.admin-operational .p-datatable,
+.collab-wallet .p-datatable {
+  width: 100%;
+}
+
+.admin-operational .p-datatable .p-datatable-thead > tr > th {
+  padding: 0.78rem 0.85rem;
+}
+
+.admin-operational .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.8rem 0.85rem;
+}
+
+.admin-operational .p-dialog {
+  max-width: 96vw;
+}
+
+.admin-saas .p-datatable {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.admin-saas .p-datatable .p-datatable-header,
+.admin-saas .p-datatable .p-datatable-footer {
+  background: #fff;
+  border: 0;
+}
+
+.admin-saas .p-datatable .p-datatable-thead > tr > th {
+  background: #f8fafc;
+  color: var(--brand-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.95rem 1rem;
+  border-color: #eef2f7;
+}
+
+.admin-saas .p-datatable .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border-color: #eef2f7;
+  color: var(--brand-text);
 }
 
 .admin-saas .p-datatable .p-datatable-tbody > tr:hover {
-  background: #f5f7fb;
+  background: #f8fbff;
+}
+
+.admin-saas .p-datatable .p-paginator {
+  border: 0;
+  border-top: 1px solid #eef2f7;
+  background: #fff;
+  padding: 0.9rem 1rem;
+}
+
+.admin-saas .p-tag {
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  padding: 0.35rem 0.7rem;
+}
+
+.admin-saas .p-tag.p-tag-success {
+  background: #ecfdf3;
+  color: var(--brand-success);
+}
+
+.admin-saas .p-tag.p-tag-warning {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.admin-saas .p-tag.p-tag-danger {
+  background: #fef2f2;
+  color: var(--brand-danger);
+}
+
+.admin-saas .p-tag.p-tag-info {
+  background: #eff6ff;
+  color: var(--brand-blue);
+}
+
+.admin-saas .p-tag.p-tag-secondary {
+  background: #f1f5f9;
+  color: var(--brand-muted);
+}
+
+.admin-saas .p-overlaypanel {
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.admin-saas .p-overlaypanel .p-overlaypanel-content {
+  padding: 1rem;
+}
+
+.admin-saas .p-button,
+.collab-wallet .p-button {
+  min-height: 2.5rem;
+}
+
+.admin-saas .p-button.p-button-icon-only,
+.collab-wallet .p-button.p-button-icon-only {
+  min-width: 2.5rem;
+}
+
+.collab-wallet .p-overlaypanel {
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.collab-wallet .p-overlaypanel .p-overlaypanel-content {
+  padding: 1rem;
+}
+
+.tablet-shell .p-inputtext,
+.tablet-shell .p-button {
+  min-height: 3rem;
+}
+
+@media (max-width: 1024px) {
+  .admin-saas .p-datatable .p-datatable-thead > tr > th,
+  .admin-saas .p-datatable .p-datatable-tbody > tr > td,
+  .admin-operational .p-datatable .p-datatable-thead > tr > th,
+  .admin-operational .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.7rem 0.75rem;
+  }
+
+  .admin-operational .p-datatable .p-datatable-thead > tr > th,
+  .admin-operational .p-datatable .p-datatable-tbody > tr > td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .p-dialog {
+    width: min(96vw, 40rem) !important;
+  }
+
+  .p-dialog {
+    max-height: calc(var(--app-dvh) - 1rem);
+  }
+
+  .p-dialog .p-dialog-content {
+    max-height: calc(var(--app-dvh) - 8rem);
+    overflow-y: auto;
+  }
+
+  .p-overlaypanel {
+    width: min(96vw, 24rem) !important;
+  }
+
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.65rem 0.7rem;
+    font-size: 0.875rem;
+  }
+
+  .p-datatable .p-paginator {
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .admin-saas .p-button,
+  .collab-wallet .p-button,
+  .tablet-shell .p-button {
+    min-height: 2.75rem;
+  }
+
+  .admin-operational .p-datatable .p-datatable-thead > tr > th,
+  .admin-operational .p-datatable .p-datatable-tbody > tr > td {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .p-dialog {
+    width: calc(100vw - 0.75rem) !important;
+  }
+
+  .p-overlaypanel {
+    width: calc(100vw - 0.75rem) !important;
+  }
 }

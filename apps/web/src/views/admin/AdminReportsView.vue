@@ -80,8 +80,8 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-slate-900">Relatórios</div>
         <div class="text-sm text-slate-600">Visão financeira, consumo e alertas.</div>
@@ -95,29 +95,29 @@ onMounted(load);
 
     <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Total vendido</div>
         <div class="mt-1 text-2xl font-bold text-[#003B8E]">{{ formatBRL(totalSold) }}</div>
       </div>
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Total pago</div>
         <div class="mt-1 text-2xl font-bold text-status-paid">{{ formatBRL(totalPaid) }}</div>
       </div>
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
         <div class="text-sm text-slate-500">Total pendente</div>
         <div class="mt-1 text-2xl font-bold text-status-pending">{{ formatBRL(totalPending) }}</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-2">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="text-sm font-semibold text-slate-900">Produtos mais consumidos</div>
           <div class="text-sm text-slate-600">Top 10</div>
         </div>
-        <div class="mt-4 space-y-3">
-          <div v-for="p in productsConsumption" :key="p.name" class="rounded-2xl border border-[#E5E7EB] p-4">
+        <div class="mt-3 space-y-2.5">
+          <div v-for="p in productsConsumption" :key="p.name" class="rounded-2xl border border-[#E5E7EB] p-3">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0">
                 <div class="truncate text-sm font-semibold text-slate-900">{{ p.name }}</div>
@@ -133,13 +133,13 @@ onMounted(load);
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="text-sm font-semibold text-slate-900">Colaboradores com maior consumo</div>
           <div class="text-sm text-slate-600">Top 10</div>
         </div>
-        <div class="mt-4 space-y-3">
-          <div v-for="u in collaboratorsConsumption" :key="u.code" class="rounded-2xl border border-[#E5E7EB] p-4">
+        <div class="mt-3 space-y-2.5">
+          <div v-for="u in collaboratorsConsumption" :key="u.code" class="rounded-2xl border border-[#E5E7EB] p-3">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0">
                 <div class="truncate text-sm font-semibold text-slate-900">{{ u.name }}</div>
@@ -156,13 +156,13 @@ onMounted(load);
       </div>
     </div>
 
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm font-semibold text-slate-900">Estoque baixo</div>
         <div class="text-sm text-slate-600">Top 10</div>
       </div>
-      <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div v-for="p in lowStock" :key="p.id" class="flex items-center justify-between rounded-2xl border border-[#E5E7EB] p-4">
+      <div class="mt-3 grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-3">
+        <div v-for="p in lowStock" :key="p.id" class="flex items-center justify-between rounded-2xl border border-[#E5E7EB] p-3">
           <div class="min-w-0">
             <div class="truncate text-sm font-semibold text-slate-900">{{ p.name }}</div>
             <div class="text-xs text-slate-500">{{ p.category }}</div>

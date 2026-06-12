@@ -106,9 +106,9 @@ onMounted(load);
         <div class="text-sm font-semibold text-slate-900">Produto</div>
         <div class="text-sm text-slate-600">Detalhe, estoque e consumo.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Voltar" severity="secondary" @click="router.push('/admin/produtos')" />
-        <Button label="Atualizar" :loading="loading" @click="load" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Voltar" severity="secondary" class="w-full sm:w-auto" @click="router.push('/admin/produtos')" />
+        <Button label="Atualizar" :loading="loading" class="w-full sm:w-auto" @click="load" />
       </div>
     </div>
 
@@ -201,23 +201,32 @@ onMounted(load);
             <div class="text-sm font-semibold text-slate-900">Histórico de entradas</div>
             <div class="text-sm text-slate-600">Últimos lançamentos.</div>
           </div>
-          <DataTable :value="detail.history.entries" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20]" stripedRows showGridlines>
-            <Column header="Data/Hora" style="min-width: 12rem">
+          <DataTable
+            :value="detail.history.entries"
+            dataKey="id"
+            paginator
+            :rows="10"
+            :rowsPerPageOptions="[10, 20]"
+            stripedRows
+            showGridlines
+            tableStyle="min-width: 100%"
+          >
+            <Column header="Data/Hora" style="min-width: 10rem">
               <template #body="{ data }">{{ new Date(data.occurredAt).toLocaleString() }}</template>
             </Column>
-            <Column header="Qtd" style="min-width: 6rem">
+            <Column header="Qtd" style="min-width: 5.5rem">
               <template #body="{ data }"><span class="font-semibold text-slate-900">{{ data.quantity }}</span></template>
             </Column>
-            <Column header="Custo" style="min-width: 10rem">
+            <Column header="Custo" style="min-width: 8rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
               <template #body="{ data }">{{ data.unitCostCents ? formatBRL(data.unitCostCents) : '-' }}</template>
             </Column>
-            <Column header="Venda" style="min-width: 10rem">
+            <Column header="Venda" style="min-width: 8rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell">
               <template #body="{ data }">{{ data.unitPriceCents ? formatBRL(data.unitPriceCents) : '-' }}</template>
             </Column>
-            <Column header="Usuário" style="min-width: 12rem">
+            <Column header="Usuário" style="min-width: 10rem">
               <template #body="{ data }">{{ data.actor.name }} ({{ data.actor.code }})</template>
             </Column>
-            <Column header="Obs." style="min-width: 14rem">
+            <Column header="Obs." style="min-width: 10rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell">
               <template #body="{ data }">{{ data.note || '-' }}</template>
             </Column>
             <template #empty>
@@ -231,17 +240,26 @@ onMounted(load);
             <div class="text-sm font-semibold text-slate-900">Histórico de saídas</div>
             <div class="text-sm text-slate-600">Últimas retiradas.</div>
           </div>
-          <DataTable :value="detail.history.outs" dataKey="occurredAt" paginator :rows="10" :rowsPerPageOptions="[10, 20]" stripedRows showGridlines>
-            <Column header="Data/Hora" style="min-width: 12rem">
+          <DataTable
+            :value="detail.history.outs"
+            dataKey="occurredAt"
+            paginator
+            :rows="10"
+            :rowsPerPageOptions="[10, 20]"
+            stripedRows
+            showGridlines
+            tableStyle="min-width: 100%"
+          >
+            <Column header="Data/Hora" style="min-width: 10rem">
               <template #body="{ data }">{{ new Date(data.occurredAt).toLocaleString() }}</template>
             </Column>
-            <Column header="Qtd" style="min-width: 6rem">
+            <Column header="Qtd" style="min-width: 5.5rem">
               <template #body="{ data }"><span class="font-semibold text-slate-900">{{ data.quantity }}</span></template>
             </Column>
-            <Column header="Valor" style="min-width: 10rem">
+            <Column header="Valor" style="min-width: 8.5rem">
               <template #body="{ data }">{{ formatBRL(data.unitPriceCents) }}</template>
             </Column>
-            <Column header="Colaborador" style="min-width: 14rem">
+            <Column header="Colaborador" style="min-width: 12rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
               <template #body="{ data }">{{ data.actor.name }} ({{ data.actor.code }})</template>
             </Column>
             <template #empty>
@@ -256,12 +274,12 @@ onMounted(load);
           <div class="text-sm font-semibold text-slate-900">Ranking de colaboradores</div>
           <div class="text-sm text-slate-600">Quem mais comprou o produto.</div>
         </div>
-        <DataTable :value="detail.ranking" dataKey="userId" stripedRows showGridlines>
-          <Column field="name" header="Colaborador" style="min-width: 18rem">
+        <DataTable :value="detail.ranking" dataKey="userId" stripedRows showGridlines tableStyle="min-width: 100%">
+          <Column field="name" header="Colaborador" style="min-width: 14rem">
             <template #body="{ data }">{{ data.name }} ({{ data.code }})</template>
           </Column>
-          <Column field="quantity" header="Qtd" style="min-width: 8rem" />
-          <Column header="Total" style="min-width: 12rem">
+          <Column field="quantity" header="Qtd" style="min-width: 6rem" />
+          <Column header="Total" style="min-width: 10rem">
             <template #body="{ data }">{{ formatBRL(data.totalCents) }}</template>
           </Column>
           <template #empty>

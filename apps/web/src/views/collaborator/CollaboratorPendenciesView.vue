@@ -61,37 +61,34 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4">
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div class="text-sm font-semibold text-slate-900">Minhas Pendências</div>
-          <div class="mt-1 text-sm text-slate-600">Aqui aparece o que ainda está em aberto.</div>
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-slate-900">Pendências</div>
+          <div class="mt-1 text-sm text-slate-600">Veja o total em aberto e quite via Pix.</div>
+          <div class="mt-4 rounded-2xl bg-[#EAF3FF] px-4 py-3">
+            <div class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Total pendente</div>
+            <div class="mt-1 text-2xl font-semibold text-[#F59E0B]">{{ formatBRL(pendingTotal) }}</div>
+          </div>
         </div>
-        <Button
-          label="Pagar agora via Pix"
-          class="w-full md:w-auto"
-          :disabled="pendingTotal <= 0"
-          @click="openPay"
-        />
+        <div class="flex w-full flex-col gap-2 sm:w-auto">
+          <Button label="Ver detalhes" severity="secondary" class="w-full sm:w-auto" :disabled="pendingTotal <= 0" @click="openPay" />
+          <Button label="Pagar agora via Pix" class="w-full sm:w-auto" :disabled="pendingTotal <= 0" @click="openPay" />
+        </div>
       </div>
-    </div>
-
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-      <div class="text-xs font-medium text-slate-600">Total em aberto</div>
-      <div class="mt-2 text-2xl font-semibold text-[#F59E0B]">{{ formatBRL(pendingTotal) }}</div>
     </div>
 
     <div v-if="my.error || error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700">{{ error || my.error }}</div>
 
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="text-sm font-semibold text-slate-900">Retiradas pendentes</div>
-        <Button label="Atualizar" severity="secondary" :loading="my.loading" @click="my.fetchAll()" />
+        <Button label="Atualizar" severity="secondary" :loading="my.loading" class="w-full sm:w-auto" @click="my.fetchAll()" />
       </div>
 
       <div v-if="my.pending.length === 0" class="mt-3 text-sm text-slate-600">Nenhuma pendência.</div>
       <div v-else class="mt-3 space-y-2">
-        <div v-for="w in my.pending" :key="w.id" class="rounded-xl border border-slate-100 p-3">
+        <div v-for="w in my.pending" :key="w.id" class="rounded-2xl border border-[#E5E7EB] bg-white p-4">
           <div class="flex items-center justify-between gap-3">
             <div class="min-w-0">
               <div class="truncate text-sm font-medium text-slate-900">{{ fmtDateTime(w.createdAt) }}</div>
@@ -106,7 +103,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <Dialog v-model:visible="payOpen" modal header="Pagamento via Pix" :style="{ width: '36rem' }" :draggable="false">
+    <Dialog v-model:visible="payOpen" modal header="Pagamento via Pix" :style="{ width: 'min(36rem, 96vw)' }" :draggable="false">
       <div class="space-y-4">
         <div class="rounded-xl bg-[#EAF3FF] p-4">
           <div class="text-sm font-semibold text-[#003B8E]">Valor total</div>
@@ -124,7 +121,7 @@ onMounted(() => {
               <img
                 v-if="pixQrUrl"
                 :src="pixQrUrl"
-                class="h-40 w-40 rounded-xl border border-slate-200 object-contain"
+                class="h-36 w-36 max-w-full rounded-xl border border-slate-200 object-contain sm:h-40 sm:w-40"
                 alt="QR Code Pix"
               />
               <div v-else class="text-sm text-slate-600">QR Code não configurado</div>

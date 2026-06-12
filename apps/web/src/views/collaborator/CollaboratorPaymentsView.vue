@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import Tag from 'primevue/tag';
 import { useMyWithdrawalsStore, type Withdrawal } from '../../stores/my-withdrawals';
+import { useSettingsStore } from '../../stores/settings';
 import { formatBRL } from '../../lib/money';
-import { FileText, Wallet } from 'lucide-vue-next';
+import { QrCode, Wallet, ReceiptText } from 'lucide-vue-next';
 
 const my = useMyWithdrawalsStore();
+const settings = useSettingsStore();
 const receiptOpen = ref(false);
 const selected = ref<Withdrawal | null>(null);
+const paying = ref(false);
+const error = ref<string | null>(null);
 
 const payments = computed(() => my.mine.filter((w) => w.paymentStatus !== 'PENDING'));
+const pendingTotal = computed(() => my.pending.reduce((sum, w) => sum + w.totalCents, 0));
+const pixKey = computed(() => settings.pixKey || import.meta.env.VITE_PIX_KEY || '');
+const pixQrUrl = computed(() => settings.pixQrCodeUrl || import.meta.env.VITE_PIX_QR_CODE_URL || '');
+
 const timeline = computed(() =>
   [...payments.value]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -39,94 +45,114 @@ function openReceipt(w: Withdrawal) {
   receiptOpen.value = true;
 }
 
+async function markAsPaid() {
+  paying.value = true;
+  error.value = null;
+  try {
+    await my.confirmPixAll();
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Falha ao confirmar pagamento';
+  } finally {
+    paying.value = false;
+  }
+}
+
 onMounted(() => {
-  if (!my.mine.length) my.fetchAll();
+  settings.loadPublic().catch(() => null);
+  if (!my.mine.length || !my.pending.length) my.fetchAll();
 });
 </script>
 
 <template>
   <div class="space-y-4">
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div>
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0">
           <div class="text-sm font-semibold text-slate-900">Pagamentos</div>
-          <div class="mt-1 text-sm text-slate-600">Histórico de pagamentos e comprovantes internos.</div>
+          <div class="mt-1 text-sm text-slate-600">Área pessoal para acompanhar Pix e comprovantes.</div>
         </div>
-        <Button label="Atualizar" severity="secondary" :loading="my.loading" @click="my.fetchAll()" />
+        <Button label="Atualizar" severity="secondary" :loading="my.loading" class="w-full sm:w-auto" @click="my.fetchAll()" />
       </div>
-      <div v-if="my.error" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{{ my.error }}</div>
+      <div v-if="my.error || error" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{{ error || my.error }}</div>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-        <div class="flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-900">Timeline</div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EAF3FF] text-[#003B8E]">
-            <Wallet class="h-5 w-5" />
-          </div>
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-slate-900">Pix</div>
+          <div class="mt-1 text-sm text-slate-600">Use este QR Code para quitar pendências.</div>
         </div>
-        <div v-if="timeline.length === 0" class="mt-4 text-sm text-slate-600">Nenhum pagamento registrado.</div>
-        <div v-else class="mt-4 space-y-3 border-l border-[#E5E7EB] pl-4">
-          <div v-for="p in timeline" :key="p.id" class="relative rounded-2xl border border-[#E5E7EB] bg-white p-4">
-            <div class="absolute -left-[22px] top-6 h-3 w-3 rounded-full bg-[#0057D9]" />
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0">
-                <div class="text-sm font-semibold text-slate-900">{{ fmtDateTime(p.createdAt) }}</div>
-                <div class="mt-1 text-xs text-slate-600">{{ methodLabel(p.paymentMethod) }}</div>
-              </div>
-              <div class="text-right">
-                <div class="text-sm font-semibold text-[#003B8E]">{{ formatBRL(p.totalCents) }}</div>
-                <Tag :value="statusLabel(p.paymentStatus)" severity="success" class="mt-2" />
-              </div>
-            </div>
-            <div class="mt-3">
-              <Button label="Ver comprovante" severity="secondary" @click="openReceipt(p)" />
-            </div>
-          </div>
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EAF3FF] text-[#003B8E]">
+          <QrCode class="h-5 w-5" />
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
-        <div class="flex items-center justify-between px-1 pb-3">
+      <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div class="rounded-2xl bg-[#EAF3FF] p-4">
+          <div class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Valor pendente</div>
+          <div class="mt-2 text-2xl font-semibold text-[#F59E0B]">{{ formatBRL(pendingTotal) }}</div>
+          <div class="mt-3 text-sm text-slate-600">Após pagar, marque como pago para registrar no sistema.</div>
+          <Button
+            label="Marcar como pago"
+            class="mt-4 w-full"
+            :disabled="pendingTotal <= 0"
+            :loading="paying"
+            @click="markAsPaid"
+          />
+        </div>
+
+        <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-xs font-medium text-slate-600">QR Code</div>
+              <div class="mt-1 text-xs text-slate-500">Chave: {{ pixKey ? 'disponível' : 'não configurada' }}</div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <img
+              v-if="pixQrUrl"
+              :src="pixQrUrl"
+              class="h-44 w-44 max-w-full rounded-2xl border border-slate-200 object-contain"
+              alt="QR Code Pix"
+            />
+            <div v-else class="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">QR Code não configurado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
           <div class="text-sm font-semibold text-slate-900">Histórico</div>
-          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EAF3FF] text-[#003B8E]">
-            <FileText class="h-5 w-5" />
+          <div class="mt-1 text-sm text-slate-600">Pagamentos e registros finalizados.</div>
+        </div>
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EAF3FF] text-[#003B8E]">
+          <Wallet class="h-5 w-5" />
+        </div>
+      </div>
+
+      <div v-if="timeline.length === 0" class="mt-4 text-sm text-slate-600">Nenhum pagamento registrado.</div>
+      <div v-else class="mt-4 space-y-3">
+        <div v-for="p in timeline" :key="p.id" class="rounded-2xl border border-[#E5E7EB] bg-white p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-slate-900">{{ fmtDateTime(p.createdAt) }}</div>
+              <div class="mt-1 text-xs text-slate-600">{{ methodLabel(p.paymentMethod) }}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-semibold text-[#003B8E]">{{ formatBRL(p.totalCents) }}</div>
+              <Tag :value="statusLabel(p.paymentStatus)" severity="success" class="mt-2" />
+            </div>
+          </div>
+          <div class="mt-3 flex justify-end">
+            <Button label="Ver comprovante" severity="secondary" size="small" class="w-full sm:w-auto" @click="openReceipt(p)" />
           </div>
         </div>
-        <DataTable :value="payments" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines>
-          <Column header="Data" style="min-width: 12rem">
-            <template #body="{ data }">
-              <span class="text-sm text-slate-900">{{ fmtDateTime(data.createdAt) }}</span>
-            </template>
-          </Column>
-          <Column header="Valor" sortField="totalCents" sortable style="min-width: 10rem">
-            <template #body="{ data }">
-              <span class="text-sm font-semibold text-[#003B8E]">{{ formatBRL(data.totalCents) }}</span>
-            </template>
-          </Column>
-          <Column header="Forma" style="min-width: 10rem">
-            <template #body="{ data }">
-              <span class="text-sm text-slate-700">{{ methodLabel(data.paymentMethod) }}</span>
-            </template>
-          </Column>
-          <Column header="Status" style="min-width: 12rem">
-            <template #body="{ data }">
-              <Tag :value="statusLabel(data.paymentStatus)" severity="success" />
-            </template>
-          </Column>
-          <Column header="Comprovante" style="min-width: 12rem">
-            <template #body="{ data }">
-              <Button label="Ver" severity="secondary" @click="openReceipt(data)" />
-            </template>
-          </Column>
-          <template #empty>
-            <div class="p-6 text-center text-sm text-slate-600">Nenhum pagamento registrado.</div>
-          </template>
-        </DataTable>
       </div>
     </div>
 
-    <Dialog v-model:visible="receiptOpen" modal header="Comprovante interno" :style="{ width: '42rem' }" :draggable="false">
+    <Dialog v-model:visible="receiptOpen" modal header="Comprovante interno" :style="{ width: 'min(52rem, 96vw)' }" :draggable="false">
       <div v-if="selected" class="space-y-4">
         <div class="rounded-xl bg-[#EAF3FF] p-4">
           <div class="text-xs font-medium text-slate-600">ID</div>
@@ -144,7 +170,10 @@ onMounted(() => {
         </div>
 
         <div class="rounded-xl bg-white">
-          <div class="text-sm font-semibold text-[#003B8E]">Itens</div>
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-semibold text-[#003B8E]">Itens</div>
+            <ReceiptText class="h-4 w-4 text-[#003B8E]" />
+          </div>
           <div class="mt-3 space-y-2">
             <div v-for="i in selected.items" :key="i.id" class="flex items-center justify-between rounded-xl border border-slate-100 p-3">
               <div class="min-w-0">

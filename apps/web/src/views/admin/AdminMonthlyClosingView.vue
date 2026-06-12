@@ -188,9 +188,9 @@ onMounted(load);
         <div class="text-sm text-slate-600">Consolidação por colaborador e cobrança.</div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <Dropdown v-model="month" :options="monthOptions" optionLabel="label" optionValue="value" class="w-44" />
-        <input v-model.number="year" type="number" min="2000" class="h-10 w-28 rounded-md border border-slate-200 px-3 text-sm" />
-        <Dropdown v-model="sector" :options="sectorOptions" optionLabel="label" optionValue="value" class="w-44" />
+        <Dropdown v-model="month" :options="monthOptions" optionLabel="label" optionValue="value" class="w-full sm:w-44" />
+        <input v-model.number="year" type="number" min="2000" class="h-10 w-full rounded-md border border-slate-200 px-3 text-sm sm:w-28" />
+        <Dropdown v-model="sector" :options="sectorOptions" optionLabel="label" optionValue="value" class="w-full sm:w-44" />
         <Button label="Atualizar" severity="secondary" :loading="loading" @click="load" />
         <Button label="Exportar Excel (CSV)" severity="secondary" :disabled="!summary" @click="exportCsv" />
         <Button label="Fechar competência" :loading="marking" @click="closeCompetence" />
@@ -219,8 +219,17 @@ onMounted(load);
     </div>
 
     <div v-if="summary" class="rounded-xl bg-white p-4 shadow">
-      <DataTable :value="summary.rows" dataKey="userId" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines tableStyle="min-width: 70rem">
-        <Column header="Colaborador" field="name" sortable style="min-width: 18rem">
+      <DataTable
+        :value="summary.rows"
+        dataKey="userId"
+        paginator
+        :rows="10"
+        :rowsPerPageOptions="[10, 20, 50]"
+        stripedRows
+        showGridlines
+        tableStyle="min-width: 100%"
+      >
+        <Column header="Colaborador" field="name" sortable style="min-width: 14rem">
           <template #body="{ data }">
             <div>
               <div class="font-semibold text-text">{{ data.name }}</div>
@@ -228,31 +237,31 @@ onMounted(load);
             </div>
           </template>
         </Column>
-        <Column header="Consumiu" field="consumedCents" sortable style="min-width: 10rem">
+        <Column header="Consumiu" field="consumedCents" sortable style="min-width: 9rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell">
           <template #body="{ data }">
             <div class="font-semibold text-primary-dark">{{ formatBRL(data.consumedCents) }}</div>
           </template>
         </Column>
-        <Column header="Pago" field="paidCents" sortable style="min-width: 10rem">
+        <Column header="Pago" field="paidCents" sortable style="min-width: 9rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
           <template #body="{ data }">
             <div class="font-semibold text-status-paid">{{ formatBRL(data.paidCents) }}</div>
           </template>
         </Column>
-        <Column header="Pendente" field="pendingCents" sortable style="min-width: 10rem">
+        <Column header="Pendente" field="pendingCents" sortable style="min-width: 9rem">
           <template #body="{ data }">
             <div class="font-semibold text-status-pending">{{ formatBRL(data.pendingCents) }}</div>
           </template>
         </Column>
-        <Column header="Status" field="status" sortable style="min-width: 12rem">
+        <Column header="Status" field="status" sortable style="min-width: 10rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
           <template #body="{ data }">
             <Tag :value="statusLabel(data.status)" :severity="statusSeverity(data.status)" />
           </template>
         </Column>
-        <Column header="Ações" style="min-width: 12rem">
+        <Column header="Ações" style="min-width: 9.5rem">
           <template #body="{ data }">
-            <div class="flex items-center gap-2">
-              <Button icon="pi pi-search" rounded severity="secondary" @click="openDetails(data)" />
-              <Button v-if="data.pendingCents > 0" icon="pi pi-check" rounded @click="openDetails(data)" />
+            <div class="flex items-center gap-1.5">
+              <Button icon="pi pi-search" rounded severity="secondary" size="small" @click="openDetails(data)" />
+              <Button v-if="data.pendingCents > 0" icon="pi pi-check" rounded size="small" @click="openDetails(data)" />
             </div>
           </template>
         </Column>
@@ -262,7 +271,7 @@ onMounted(load);
       </DataTable>
     </div>
 
-    <Dialog v-model:visible="detailsOpen" modal header="Extrato do colaborador" position="right" :style="{ width: '34rem' }" :draggable="false">
+    <Dialog v-model:visible="detailsOpen" modal header="Extrato do colaborador" position="right" :style="{ width: 'min(34rem, 96vw)' }" :draggable="false">
       <div v-if="selected" class="space-y-4">
         <div class="rounded-lg bg-slate-50 p-4">
           <div class="text-sm font-semibold text-text">{{ selected.name }} ({{ selected.code }})</div>
@@ -317,4 +326,3 @@ onMounted(load);
     </Dialog>
   </div>
 </template>
-

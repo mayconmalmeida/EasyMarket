@@ -43,6 +43,7 @@ const form = ref({
   minStock: settings.minStockDefault,
   photoUrl: '',
   status: 'ACTIVE' as Product['status'],
+  hideOnTablet: false,
 });
 
 const stockForm = ref({ stock: 0 });
@@ -58,6 +59,10 @@ const categoryOptions = computed(() => [
   { label: 'Todas', value: 'ALL' as const },
   ...categoriesStore.items.map((c) => ({ label: c.name, value: c.name })),
 ]);
+
+const productCategoryOptions = computed(() =>
+  categoriesStore.active.map((c) => ({ label: c.name, value: c.name })),
+);
 
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase();
@@ -85,13 +90,14 @@ function openCreate() {
   form.value = {
     barcode: '',
     name: '',
-    category: category.value !== 'ALL' ? category.value : categoriesStore.items[0]?.name ?? '',
+    category: category.value !== 'ALL' ? category.value : categoriesStore.active[0]?.name ?? '',
     cost: 0,
     price: 0,
     stock: 0,
     minStock: settings.minStockDefault,
     photoUrl: '',
     status: 'ACTIVE',
+    hideOnTablet: false,
   };
   createOpen.value = true;
 }
@@ -110,6 +116,7 @@ function openEdit(p: Product) {
     minStock: p.minStock,
     photoUrl: p.photoUrl ?? '',
     status: p.status,
+    hideOnTablet: p.hideOnTablet,
   };
   editOpen.value = true;
 }
@@ -142,18 +149,23 @@ async function saveCreate() {
   saving.value = true;
   error.value = null;
   try {
+    const catName = form.value.category.trim();
+    if (!catName) {
+      error.value = 'Selecione uma categoria cadastrada';
+      return;
+    }
     await productsStore.create({
       barcode: form.value.barcode.trim() || null,
       name: form.value.name.trim(),
-      category: form.value.category.trim(),
+      category: catName,
       photoUrl: form.value.photoUrl.trim() || null,
       costCents: form.value.cost ? toCents(Number(form.value.cost)) : null,
       priceCents: toCents(Number(form.value.price)),
       stock: Number(form.value.stock),
       minStock: Number(form.value.minStock),
       status: form.value.status,
+      hideOnTablet: !!form.value.hideOnTablet,
     });
-    categoriesStore.bootstrapFromNames(productsStore.categories);
     createOpen.value = false;
     photoMeta.value = null;
   } catch (e: any) {
@@ -168,18 +180,23 @@ async function saveEdit() {
   saving.value = true;
   error.value = null;
   try {
+    const catName = form.value.category.trim();
+    if (!catName) {
+      error.value = 'Selecione uma categoria cadastrada';
+      return;
+    }
     await productsStore.update(selected.value.id, {
       barcode: form.value.barcode.trim() || null,
       name: form.value.name.trim(),
-      category: form.value.category.trim(),
+      category: catName,
       photoUrl: form.value.photoUrl.trim() || null,
       costCents: form.value.cost ? toCents(Number(form.value.cost)) : null,
       priceCents: toCents(Number(form.value.price)),
       stock: Number(form.value.stock),
       minStock: Number(form.value.minStock),
       status: form.value.status,
+      hideOnTablet: !!form.value.hideOnTablet,
     });
-    categoriesStore.bootstrapFromNames(productsStore.categories);
     editOpen.value = false;
     photoMeta.value = null;
   } catch (e: any) {
@@ -195,6 +212,20 @@ async function toggleStatus(p: Product) {
     await productsStore.update(p.id, { status: p.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' });
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'Falha ao alterar status';
+  }
+}
+
+async function removeProduct(p: Product) {
+  error.value = null;
+  const ok = window.confirm(`Excluir o produto "${p.name}"? Essa ação não pode ser desfeita.`);
+  if (!ok) return;
+  saving.value = true;
+  try {
+    await productsStore.remove(p.id);
+  } catch (e: any) {
+    error.value = e?.response?.data?.message ?? 'Falha ao excluir produto';
+  } finally {
+    saving.value = false;
   }
 }
 
@@ -230,34 +261,31 @@ async function load() {
   error.value = null;
   await productsStore.fetchAll();
   await categoriesStore.fetch();
-  const existing = new Set(categoriesStore.items.map((c) => c.name));
-  const missing = productsStore.categories.filter((c) => !existing.has(c));
-  if (missing.length) await categoriesStore.bootstrapFromNames(missing);
 }
 
 onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-slate-900">Produtos</div>
         <div class="text-sm text-slate-600">Catálogo, estoque e status.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Atualizar" severity="secondary" :loading="productsStore.loading" @click="load" />
-        <Button label="Novo Produto" @click="openCreate" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Atualizar" severity="secondary" class="w-full sm:w-auto" :loading="productsStore.loading" @click="load" />
+        <Button label="Novo Produto" class="w-full sm:w-auto" @click="openCreate" />
       </div>
     </div>
 
     <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm xl:col-span-1">
         <div class="text-sm font-semibold text-slate-900">Filtros</div>
         <div class="mt-1 text-sm text-slate-600">Refine a listagem.</div>
-        <div class="mt-3 space-y-3">
+        <div class="mt-3 grid grid-cols-1 gap-2.5">
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-600">Buscar por nome</label>
             <InputText v-model="search" class="w-full" placeholder="Ex: Água" />
@@ -280,7 +308,7 @@ onMounted(load);
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm lg:col-span-3">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-sm xl:col-span-4">
         <DataTable
           :value="filtered"
           dataKey="id"
@@ -289,17 +317,17 @@ onMounted(load);
           :rowsPerPageOptions="[10, 20, 50]"
           stripedRows
           showGridlines
-          tableStyle="min-width: 60rem"
+          tableStyle="min-width: 100%"
         >
-          <Column field="name" header="Produto" sortable style="min-width: 18rem" />
-          <Column field="barcode" header="Código de barras" sortable style="min-width: 12rem" />
-          <Column field="category" header="Categoria" sortable style="min-width: 12rem" />
-          <Column header="Preço" sortable sortField="priceCents" style="min-width: 10rem">
+          <Column field="name" header="Produto" sortable style="min-width: 13rem" />
+          <Column field="barcode" header="Código de barras" sortable style="min-width: 10rem" headerClass="hidden xl:table-cell" class="hidden xl:table-cell" />
+          <Column field="category" header="Categoria" sortable style="min-width: 9rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell" />
+          <Column header="Preço" sortable sortField="priceCents" style="min-width: 8rem">
             <template #body="{ data }">
               <span class="font-semibold text-[#003B8E]">{{ formatBRL(data.priceCents) }}</span>
             </template>
           </Column>
-          <Column header="Estoque" sortable sortField="stock" style="min-width: 10rem">
+          <Column header="Estoque" sortable sortField="stock" style="min-width: 8rem">
             <template #body="{ data }">
               <Tag
                 :value="`${data.stock} (mín. ${data.minStock})`"
@@ -307,23 +335,25 @@ onMounted(load);
               />
             </template>
           </Column>
-          <Column header="Status" sortable sortField="status" style="min-width: 8rem">
+          <Column header="Status" sortable sortField="status" style="min-width: 7rem">
             <template #body="{ data }">
               <Tag :value="data.status === 'ACTIVE' ? 'Ativo' : 'Inativo'" :severity="statusSeverity(data)" />
             </template>
           </Column>
-          <Column header="Ações" style="min-width: 14rem">
+          <Column header="Ações" style="min-width: 9rem">
             <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <Button icon="pi pi-info-circle" rounded severity="secondary" @click="goDetail(data)" />
-                <Button icon="pi pi-pencil" rounded severity="secondary" @click="openEdit(data)" />
-                <Button icon="pi pi-sliders-h" rounded severity="secondary" @click="openStock(data)" />
+              <div class="flex flex-wrap items-center gap-1.5">
+                <Button icon="pi pi-info-circle" rounded severity="secondary" size="small" @click="goDetail(data)" />
+                <Button icon="pi pi-pencil" rounded severity="secondary" size="small" @click="openEdit(data)" />
+                <Button icon="pi pi-sliders-h" rounded severity="secondary" size="small" @click="openStock(data)" />
                 <Button
                   :icon="data.status === 'ACTIVE' ? 'pi pi-eye-slash' : 'pi pi-eye'"
                   rounded
+                  size="small"
                   severity="secondary"
                   @click="toggleStatus(data)"
                 />
+                <Button icon="pi pi-trash" rounded severity="danger" size="small" @click="removeProduct(data)" />
               </div>
             </template>
           </Column>
@@ -335,9 +365,9 @@ onMounted(load);
       </div>
     </div>
 
-    <Dialog v-model:visible="createOpen" modal header="Novo Produto" :style="{ width: '42rem' }" :draggable="false">
-      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div class="space-y-1 md:col-span-2">
+    <Dialog v-model:visible="createOpen" modal header="Novo Produto" :style="{ width: 'min(56rem, 96vw)' }" :draggable="false">
+      <div class="grid grid-cols-1 gap-2.5 md:grid-cols-3">
+        <div class="space-y-1 md:col-span-3">
           <label class="text-sm font-medium text-slate-700">Nome</label>
           <InputText v-model="form.name" class="w-full" />
         </div>
@@ -349,7 +379,18 @@ onMounted(load);
 
         <div class="space-y-1">
           <label class="text-sm font-medium text-slate-700">Categoria</label>
-          <InputText v-model="form.category" class="w-full" />
+          <Dropdown
+            v-model="form.category"
+            class="w-full"
+            :options="productCategoryOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecione"
+            :disabled="!productCategoryOptions.length"
+          />
+          <div v-if="!productCategoryOptions.length" class="text-xs text-slate-500">
+            Cadastre categorias primeiro em Admin → Categorias.
+          </div>
         </div>
 
         <div class="space-y-1">
@@ -383,12 +424,20 @@ onMounted(load);
           </div>
         </div>
 
-        <div class="space-y-1 md:col-span-2">
+        <div class="space-y-1 md:col-span-1">
           <label class="text-sm font-medium text-slate-700">Status</label>
           <select v-model="form.status" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm">
             <option value="ACTIVE">Ativo</option>
             <option value="INACTIVE">Inativo</option>
           </select>
+        </div>
+
+        <div class="space-y-1 md:col-span-2">
+          <label class="flex items-center gap-2 text-sm text-slate-700">
+            <input v-model="form.hideOnTablet" type="checkbox" class="h-4 w-4 rounded border-[#E5E7EB]" />
+            Não visualizar no Tablet
+          </label>
+          <div class="text-xs text-slate-500">Se marcado, o produto não aparece na tela de compra do tablet.</div>
         </div>
       </div>
 
@@ -400,9 +449,9 @@ onMounted(load);
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="editOpen" modal header="Editar Produto" :style="{ width: '42rem' }" :draggable="false">
-      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div class="space-y-1 md:col-span-2">
+    <Dialog v-model:visible="editOpen" modal header="Editar Produto" :style="{ width: 'min(56rem, 96vw)' }" :draggable="false">
+      <div class="grid grid-cols-1 gap-2.5 md:grid-cols-3">
+        <div class="space-y-1 md:col-span-3">
           <label class="text-sm font-medium text-slate-700">Nome</label>
           <InputText v-model="form.name" class="w-full" />
         </div>
@@ -414,7 +463,18 @@ onMounted(load);
 
         <div class="space-y-1">
           <label class="text-sm font-medium text-slate-700">Categoria</label>
-          <InputText v-model="form.category" class="w-full" />
+          <Dropdown
+            v-model="form.category"
+            class="w-full"
+            :options="productCategoryOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecione"
+            :disabled="!productCategoryOptions.length"
+          />
+          <div v-if="!productCategoryOptions.length" class="text-xs text-slate-500">
+            Cadastre categorias primeiro em Admin → Categorias.
+          </div>
         </div>
 
         <div class="space-y-1">
@@ -448,12 +508,20 @@ onMounted(load);
           </div>
         </div>
 
-        <div class="space-y-1 md:col-span-2">
+        <div class="space-y-1 md:col-span-1">
           <label class="text-sm font-medium text-slate-700">Status</label>
           <select v-model="form.status" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm">
             <option value="ACTIVE">Ativo</option>
             <option value="INACTIVE">Inativo</option>
           </select>
+        </div>
+
+        <div class="space-y-1 md:col-span-2">
+          <label class="flex items-center gap-2 text-sm text-slate-700">
+            <input v-model="form.hideOnTablet" type="checkbox" class="h-4 w-4 rounded border-[#E5E7EB]" />
+            Não visualizar no Tablet
+          </label>
+          <div class="text-xs text-slate-500">Se marcado, o produto não aparece na tela de compra do tablet.</div>
         </div>
       </div>
 

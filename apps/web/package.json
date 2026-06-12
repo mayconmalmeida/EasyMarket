@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/core": "^8.3.4",
     "@fontsource/inter": "^5.2.6",
     "@primeuix/themes": "^2.0.3",
     "apexcharts": "^5.3.4",
@@ -17,12 +18,14 @@
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.5",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.32",
-    "vue3-apexcharts": "^1.9.0",
-    "vue-router": "^5.0.6"
+    "vue-router": "^5.0.6",
+    "vue3-apexcharts": "^1.9.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.2",
+    "@types/qrcode": "^1.5.6",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
     "autoprefixer": "^10.5.0",

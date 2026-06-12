@@ -116,24 +116,24 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-sm font-semibold text-slate-900">Movimentações de Estoque</div>
         <div class="text-sm text-slate-600">Entradas, saídas por retirada e ajustes manuais.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Atualizar" severity="secondary" :loading="movementsStore.loading" @click="load" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Atualizar" severity="secondary" class="w-full sm:w-auto" :loading="movementsStore.loading" @click="load" />
       </div>
     </div>
 
     <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm xl:col-span-1">
         <div class="text-sm font-semibold text-slate-900">Filtros</div>
         <div class="mt-1 text-sm text-slate-600">Refine a listagem.</div>
-        <div class="mt-3 space-y-3">
+        <div class="mt-3 grid grid-cols-1 gap-2.5">
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-600">Produto</label>
             <Dropdown v-model="filters.productId" class="w-full" :options="productOptions" optionLabel="label" optionValue="value" />
@@ -161,12 +161,12 @@ onMounted(async () => {
 
           <div class="flex items-center gap-2">
             <Button label="Aplicar" class="flex-1" @click="load" />
-            <Button label="Limpar" severity="secondary" @click="clearDates" />
+            <Button label="Limpar" severity="secondary" size="small" @click="clearDates" />
           </div>
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm lg:col-span-3">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-sm xl:col-span-4">
         <DataTable
           :value="movementsStore.items"
           dataKey="id"
@@ -175,41 +175,41 @@ onMounted(async () => {
           :rowsPerPageOptions="[10, 20, 50]"
           stripedRows
           showGridlines
-          tableStyle="min-width: 70rem"
+          tableStyle="min-width: 100%"
         >
-          <Column header="Data/Hora" style="min-width: 12rem">
+          <Column header="Data/Hora" style="min-width: 10rem">
             <template #body="{ data }">
               <span class="text-sm text-slate-700">{{ new Date(data.occurredAt).toLocaleString() }}</span>
             </template>
           </Column>
-          <Column field="product.name" header="Produto" style="min-width: 18rem" />
-          <Column field="product.category" header="Categoria" style="min-width: 12rem" />
+          <Column field="product.name" header="Produto" style="min-width: 12rem" />
+          <Column field="product.category" header="Categoria" style="min-width: 8rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell" />
           <Column header="Qtd" style="min-width: 6rem">
             <template #body="{ data }">
               <span class="font-semibold text-slate-900">{{ qtyLabel(data) }}</span>
             </template>
           </Column>
-          <Column header="Tipo" style="min-width: 8rem">
+          <Column header="Tipo" style="min-width: 7rem">
             <template #body="{ data }">
               <Tag :value="typeLabel(data.type)" :severity="typeSeverity(data.type)" />
             </template>
           </Column>
-          <Column header="Origem" style="min-width: 10rem">
+          <Column header="Origem" style="min-width: 8rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
             <template #body="{ data }">
               <span class="text-sm text-slate-700">{{ sourceLabel(data.source) }}</span>
             </template>
           </Column>
-          <Column header="Valor" style="min-width: 10rem">
+          <Column header="Valor" style="min-width: 8rem" headerClass="hidden xl:table-cell" class="hidden xl:table-cell">
             <template #body="{ data }">
               <span class="text-sm text-slate-700">{{ moneyOrDash(data.unitPriceCents) }}</span>
             </template>
           </Column>
-          <Column header="Usuário" style="min-width: 14rem">
+          <Column header="Usuário" style="min-width: 9rem" headerClass="hidden lg:table-cell" class="hidden lg:table-cell">
             <template #body="{ data }">
               <span class="text-sm text-slate-700">{{ data.actor.name }} ({{ data.actor.code }})</span>
             </template>
           </Column>
-          <Column header="Obs." style="min-width: 16rem">
+          <Column header="Obs." style="min-width: 9rem" headerClass="hidden xl:table-cell" class="hidden xl:table-cell">
             <template #body="{ data }">
               <span class="text-sm text-slate-700">{{ data.note || '-' }}</span>
             </template>

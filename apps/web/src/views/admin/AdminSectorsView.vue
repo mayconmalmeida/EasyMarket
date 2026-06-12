@@ -80,15 +80,15 @@ onMounted(() => {
         <div class="text-sm font-semibold text-slate-900">Setores</div>
         <div class="text-sm text-slate-600">Cadastre setores para usar no perfil do colaborador.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Novo Setor" @click="openCreate" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Novo Setor" class="w-full sm:w-auto" @click="openCreate" />
       </div>
     </div>
 
     <div v-if="sectors.error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ sectors.error }}</div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm xl:col-span-1">
         <div class="text-sm font-semibold text-slate-900">Busca</div>
         <div class="mt-1 text-sm text-slate-600">Filtre por nome.</div>
         <div class="mt-3 space-y-1">
@@ -97,9 +97,9 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm lg:col-span-3">
-        <DataTable :value="filtered" dataKey="id" paginator :rows="10" stripedRows showGridlines tableStyle="min-width: 48rem">
-          <Column header="Setor" sortable field="name" style="min-width: 20rem">
+      <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm xl:col-span-4">
+        <DataTable :value="filtered" dataKey="id" paginator :rows="10" stripedRows showGridlines tableStyle="min-width: 100%">
+          <Column header="Setor" sortable field="name" style="min-width: 14rem">
             <template #body="{ data }">
               <div class="font-semibold text-slate-900">{{ data.name }}</div>
             </template>
@@ -109,11 +109,11 @@ onMounted(() => {
               <Tag :value="data.status === 'ACTIVE' ? 'Ativo' : 'Inativo'" :severity="data.status === 'ACTIVE' ? 'success' : 'secondary'" />
             </template>
           </Column>
-          <Column header="Ações" style="min-width: 12rem">
+          <Column header="Ações" style="min-width: 9rem">
             <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <Button icon="pi pi-pencil" rounded severity="secondary" @click="openEdit(data)" />
-                <Button :icon="data.status === 'ACTIVE' ? 'pi pi-eye-slash' : 'pi pi-eye'" rounded severity="secondary" @click="toggleStatus(data)" />
+              <div class="flex flex-wrap items-center gap-2">
+                <Button icon="pi pi-pencil" rounded severity="secondary" size="small" @click="openEdit(data)" />
+                <Button :icon="data.status === 'ACTIVE' ? 'pi pi-eye-slash' : 'pi pi-eye'" rounded severity="secondary" size="small" @click="toggleStatus(data)" />
               </div>
             </template>
           </Column>
@@ -124,7 +124,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <Dialog v-model:visible="dialogOpen" modal :header="editing ? 'Editar Setor' : 'Novo Setor'" :style="{ width: '36rem' }" :draggable="false">
+    <Dialog v-model:visible="dialogOpen" modal :header="editing ? 'Editar Setor' : 'Novo Setor'" :style="{ width: 'min(36rem, 96vw)' }" :draggable="false">
       <div class="space-y-3">
         <div v-if="error" class="rounded-2xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
         <div class="grid grid-cols-1 gap-3">
@@ -143,7 +143,7 @@ onMounted(() => {
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
           <Button label="Cancelar" severity="secondary" @click="dialogOpen = false" />
           <Button label="Salvar" :loading="saving" @click="save" />
         </div>
@@ -151,4 +151,3 @@ onMounted(() => {
     </Dialog>
   </div>
 </template>
-

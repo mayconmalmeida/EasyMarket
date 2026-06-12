@@ -1,20 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import Tag from 'primevue/tag';
 import { useMyWithdrawalsStore, type PaymentMethod, type PaymentStatus } from '../../stores/my-withdrawals';
 import { formatBRL } from '../../lib/money';
-
-type Row = {
-  id: string;
-  createdAt: string;
-  product: string;
-  quantity: number;
-  valueCents: number;
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
-};
 
 const my = useMyWithdrawalsStore();
 
@@ -23,24 +11,6 @@ const to = ref<string>('');
 const status = ref<'ALL' | 'PAID' | 'PENDING'>('ALL');
 const method = ref<'ALL' | PaymentMethod>('ALL');
 
-const rows = computed<Row[]>(() => {
-  const out: Row[] = [];
-  for (const w of my.mine) {
-    for (const i of w.items) {
-      out.push({
-        id: `${w.id}:${i.id}`,
-        createdAt: w.createdAt,
-        product: i.product.name,
-        quantity: i.quantity,
-        valueCents: i.quantity * i.unitPriceCents,
-        paymentMethod: w.paymentMethod,
-        paymentStatus: w.paymentStatus,
-      });
-    }
-  }
-  return out;
-});
-
 function parseDateInput(value: string) {
   if (!value) return null;
   const [y, m, d] = value.split('-').map(Number);
@@ -48,23 +18,26 @@ function parseDateInput(value: string) {
   return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
 
-const filtered = computed(() => {
+const filteredWithdrawals = computed(() => {
   const fromDate = parseDateInput(from.value);
   const toDate = parseDateInput(to.value);
   const toEnd = toDate ? new Date(toDate.getTime() + 24 * 60 * 60 * 1000) : null;
 
-  return rows.value.filter((r) => {
-    const d = new Date(r.createdAt);
+  return my.mine.filter((w) => {
+    const d = new Date(w.createdAt);
     if (fromDate && d < fromDate) return false;
     if (toEnd && d >= toEnd) return false;
     if (status.value !== 'ALL') {
-      const s = r.paymentStatus === 'PENDING' ? 'PENDING' : 'PAID';
+      const s = w.paymentStatus === 'PENDING' ? 'PENDING' : 'PAID';
       if (s !== status.value) return false;
     }
-    if (method.value !== 'ALL' && r.paymentMethod !== method.value) return false;
+    if (method.value !== 'ALL' && w.paymentMethod !== method.value) return false;
     return true;
   });
 });
+
+const totalCents = computed(() => filteredWithdrawals.value.reduce((sum, w) => sum + (w.totalCents ?? 0), 0));
+const totalPurchases = computed(() => filteredWithdrawals.value.length);
 
 function fmtDateTime(iso: string) {
   return new Date(iso).toLocaleString('pt-BR');
@@ -93,10 +66,20 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4">
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-      <div class="text-sm font-semibold text-slate-900">Meu Consumo</div>
-      <div class="mt-1 text-sm text-slate-600">Use os filtros para consultar seu extrato.</div>
-      <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+    <div class="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-slate-900">Meu Extrato</div>
+          <div class="mt-1 text-sm text-slate-600">Compras registradas no mercadinho.</div>
+        </div>
+        <div class="flex items-center gap-2 rounded-2xl bg-[#EAF3FF] px-3 py-2 text-xs font-semibold text-[#003B8E]">
+          <span>{{ totalPurchases }} compras</span>
+          <span class="text-slate-300">•</span>
+          <span>Total {{ formatBRL(totalCents) }}</span>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
         <div class="space-y-1">
           <label class="text-xs font-medium text-slate-600">Período (de)</label>
           <input v-model="from" type="date" class="w-full rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-slate-900" />
@@ -127,34 +110,33 @@ onMounted(() => {
       <div v-if="my.error" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{{ my.error }}</div>
     </div>
 
-    <div class="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
-      <DataTable :value="filtered" dataKey="id" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows showGridlines>
-        <Column header="Data" style="min-width: 12rem">
-          <template #body="{ data }">
-            <span class="text-sm text-slate-900">{{ fmtDateTime(data.createdAt) }}</span>
-          </template>
-        </Column>
-        <Column header="Produto" field="product" sortable style="min-width: 16rem" />
-        <Column header="Qtde" field="quantity" sortable style="min-width: 6rem" />
-        <Column header="Valor" sortable sortField="valueCents" style="min-width: 10rem">
-          <template #body="{ data }">
-            <span class="text-sm font-semibold text-[#003B8E]">{{ formatBRL(data.valueCents) }}</span>
-          </template>
-        </Column>
-        <Column header="Pagamento" field="paymentMethod" style="min-width: 10rem">
-          <template #body="{ data }">
-            <span class="text-sm text-slate-700">{{ methodLabel(data.paymentMethod) }}</span>
-          </template>
-        </Column>
-        <Column header="Status" field="paymentStatus" style="min-width: 10rem">
-          <template #body="{ data }">
-            <Tag :value="statusLabel(data.paymentStatus)" :severity="statusSeverity(data.paymentStatus)" />
-          </template>
-        </Column>
-        <template #empty>
-          <div class="p-6 text-center text-sm text-slate-600">Sem registros para os filtros selecionados.</div>
-        </template>
-      </DataTable>
+    <div class="space-y-3">
+      <div
+        v-for="w in filteredWithdrawals"
+        :key="w.id"
+        class="rounded-[22px] border border-[#E5E7EB] bg-white p-4 shadow-sm"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">
+              {{ w.items.map((i) => i.product.name).slice(0, 2).join(', ') }}<span v-if="w.items.length > 2">…</span>
+            </div>
+            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+              <span>{{ fmtDateTime(w.createdAt) }}</span>
+              <span class="text-slate-300">•</span>
+              <span class="font-medium text-slate-700">{{ methodLabel(w.paymentMethod) }}</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-semibold text-[#003B8E]">{{ formatBRL(w.totalCents) }}</div>
+            <Tag class="mt-2" :value="statusLabel(w.paymentStatus)" :severity="statusSeverity(w.paymentStatus)" />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="filteredWithdrawals.length === 0" class="rounded-2xl border border-[#E5E7EB] bg-white p-6 text-center text-sm text-slate-600">
+        Sem compras para os filtros selecionados.
+      </div>
     </div>
   </div>
 </template>

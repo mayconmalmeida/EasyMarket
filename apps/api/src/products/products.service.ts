@@ -24,6 +24,7 @@ export class ProductsService {
         stock: dto.stock,
         minStock: dto.minStock,
         status: dto.status ?? ProductStatus.ACTIVE,
+        hideOnTablet: dto.hideOnTablet ?? false,
       },
     });
   }
@@ -66,5 +67,24 @@ export class ProductsService {
 
       return updated;
     });
+  }
+
+  async remove(id: string) {
+    const existing = await this.prisma.product.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Produto não encontrado');
+
+    const [movements, items] = await Promise.all([
+      this.prisma.stockMovement.count({ where: { productId: id } }),
+      this.prisma.withdrawalItem.count({ where: { productId: id } }),
+    ]);
+
+    if (movements > 0 || items > 0) {
+      throw new BadRequestException(
+        'Não é possível excluir: este produto já possui movimentações/retiradas registradas.',
+      );
+    }
+
+    await this.prisma.product.delete({ where: { id } });
+    return { ok: true };
   }
 }

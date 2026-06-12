@@ -56,7 +56,12 @@ npm run dev
 ```
 
 - Web: `http://localhost:5173`
-- API: `http://localhost:3000`
+- API: `http://localhost:8081`
+
+Padrão local de desenvolvimento:
+
+- API roda em `8081` para evitar conflito com outros serviços comuns em `8080`
+- Web usa `VITE_API_URL=http://localhost:8081` por padrão via `.env` ou fallback interno
 
 ## Acessos rápidos
 
@@ -66,10 +71,7 @@ npm run dev
 
 ## APK do Tablet (Android)
 
-O APK do tablet é um app Android (Capacitor) que abre a URL do tablet do seu servidor.
-
-- URL atual configurada em `capacitor.config.ts`: `http://192.168.3.3:5173/tablet`
-- Para trocar a URL antes de gerar o APK, altere `server.url` nesse arquivo.
+O APK do tablet é um app Android (Capacitor) que roda o frontend embarcado no APK e consome a API pela rede.
 
 ### Requisitos
 

@@ -208,24 +208,24 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 rounded-xl bg-white p-4 shadow md:flex-row md:items-center md:justify-between">
+  <div class="admin-operational space-y-3">
+    <div class="flex flex-col gap-2 rounded-xl bg-white p-4 shadow md:flex-row md:items-center md:justify-between">
       <div class="min-w-0">
         <div class="text-text text-lg font-semibold">Colaboradores</div>
         <div class="text-sm text-slate-600">Cadastro, perfis e controle de acesso.</div>
       </div>
-      <div class="flex items-center gap-2">
-        <Button label="Atualizar" severity="secondary" :loading="usersStore.loading || withdrawalsStore.loading" @click="load" />
-        <Button label="Novo Colaborador" @click="openCreate" />
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button label="Atualizar" severity="secondary" class="w-full sm:w-auto" :loading="usersStore.loading || withdrawalsStore.loading" @click="load" />
+        <Button label="Novo Colaborador" class="w-full sm:w-auto" @click="openCreate" />
       </div>
     </div>
 
     <div v-if="error" class="rounded-md bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
 
-    <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-      <div class="rounded-xl bg-white p-4 shadow lg:col-span-1">
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-5">
+      <div class="rounded-xl bg-white p-4 shadow xl:col-span-1">
         <div class="text-sm font-semibold text-text">Filtros</div>
-        <div class="mt-3 space-y-3">
+        <div class="mt-3 grid grid-cols-1 gap-2.5">
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-600">Buscar (nome ou código)</label>
             <InputText v-model="search" class="w-full" placeholder="Ex: João ou 0001" />
@@ -248,7 +248,7 @@ onMounted(load);
         </div>
       </div>
 
-      <div class="rounded-xl bg-white p-4 shadow lg:col-span-3">
+      <div class="rounded-xl bg-white p-3 shadow xl:col-span-4">
         <DataTable
           :value="filtered"
           dataKey="id"
@@ -257,9 +257,9 @@ onMounted(load);
           :rowsPerPageOptions="[10, 20, 50]"
           stripedRows
           showGridlines
-          tableStyle="min-width: 60rem"
+          tableStyle="min-width: 100%"
         >
-          <Column header="Colaborador" sortable field="name" style="min-width: 18rem">
+          <Column header="Colaborador" sortable field="name" style="min-width: 13rem">
             <template #body="{ data }">
               <div>
                 <div class="font-semibold text-text">{{ data.name }}</div>
@@ -267,28 +267,29 @@ onMounted(load);
               </div>
             </template>
           </Column>
-          <Column header="Perfil" sortable field="role" style="min-width: 10rem">
+          <Column header="Perfil" sortable field="role" style="min-width: 8rem" headerClass="hidden md:table-cell" class="hidden md:table-cell">
             <template #body="{ data }">
               <Tag :value="data.role === 'ADMIN' ? 'Admin' : 'Colaborador'" :severity="data.role === 'ADMIN' ? 'info' : 'secondary'" />
             </template>
           </Column>
-          <Column header="Status" sortable field="status" style="min-width: 10rem">
+          <Column header="Status" sortable field="status" style="min-width: 8rem">
             <template #body="{ data }">
               <Tag :value="data.status === 'ACTIVE' ? 'Ativo' : 'Bloqueado'" :severity="data.status === 'ACTIVE' ? 'success' : 'danger'" />
             </template>
           </Column>
-          <Column header="Ações" style="min-width: 18rem">
+          <Column header="Ações" style="min-width: 10rem">
             <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <Button icon="pi pi-pencil" rounded severity="secondary" @click="openEdit(data)" />
-                <Button icon="pi pi-key" rounded severity="secondary" @click="resetPin(data)" />
+              <div class="flex flex-wrap items-center gap-1.5">
+                <Button icon="pi pi-pencil" rounded severity="secondary" size="small" @click="openEdit(data)" />
+                <Button icon="pi pi-key" rounded severity="secondary" size="small" @click="resetPin(data)" />
                 <Button
                   :icon="data.status === 'ACTIVE' ? 'pi pi-user-minus' : 'pi pi-user-plus'"
                   rounded
+                  size="small"
                   severity="secondary"
                   @click="toggleStatus(data)"
                 />
-                <Button icon="pi pi-chart-line" rounded severity="secondary" @click="openConsumption(data)" />
+                <Button icon="pi pi-chart-line" rounded severity="secondary" size="small" @click="openConsumption(data)" />
               </div>
             </template>
           </Column>
@@ -300,11 +301,17 @@ onMounted(load);
       </div>
     </div>
 
-    <Dialog v-model:visible="dialogOpen" modal :header="editing ? 'Editar Colaborador' : 'Novo Colaborador'" :style="{ width: '42rem' }" :draggable="false">
-      <div class="space-y-3">
+    <Dialog
+      v-model:visible="dialogOpen"
+      modal
+      :header="editing ? 'Editar Colaborador' : 'Novo Colaborador'"
+      :style="{ width: 'min(52rem, 96vw)' }"
+      :draggable="false"
+    >
+      <div class="space-y-2.5">
         <div v-if="error" class="rounded-md bg-red-50 p-3 text-sm text-red-700">{{ error }}</div>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <div class="space-y-1 md:col-span-2">
+        <div class="grid grid-cols-1 gap-2.5 md:grid-cols-3">
+          <div class="space-y-1 md:col-span-3">
             <label class="text-sm font-medium text-slate-700">Nome</label>
             <InputText v-model="form.name" class="w-full" />
           </div>
@@ -316,7 +323,7 @@ onMounted(load);
             <label class="text-sm font-medium text-slate-700">PIN (4 ou 6 dígitos)</label>
             <Password v-model="form.pin" class="w-full" :feedback="false" toggleMask />
           </div>
-          <div class="space-y-1 md:col-span-2">
+          <div class="space-y-1 md:col-span-1">
             <label class="text-sm font-medium text-slate-700">Setor</label>
             <Dropdown
               v-model="form.sectorId"
@@ -345,14 +352,14 @@ onMounted(load);
         </div>
       </div>
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
           <Button label="Cancelar" severity="secondary" @click="dialogOpen = false" />
           <Button label="Salvar" :loading="saving" @click="save" />
         </div>
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="consumptionOpen" modal header="Consumo do colaborador" :style="{ width: '46rem' }" :draggable="false">
+    <Dialog v-model:visible="consumptionOpen" modal header="Consumo do colaborador" :style="{ width: 'min(52rem, 96vw)' }" :draggable="false">
       <div v-if="selected && consumption" class="space-y-4">
         <div class="rounded-lg bg-slate-50 p-4">
           <div class="text-sm font-semibold text-text">{{ selected.name }} ({{ selected.code }})</div>

@@ -12,6 +12,7 @@ export type Product = {
   stock: number;
   minStock: number;
   status: 'ACTIVE' | 'INACTIVE';
+  hideOnTablet: boolean;
 };
 
 type ProductsState = {
@@ -45,6 +46,10 @@ export const useProductsStore = defineStore('products', {
       const { data } = await api.patch<Product>(`/products/${id}`, patch);
       this.items = this.items.map((p) => (p.id === id ? data : p));
       return data;
+    },
+    async remove(id: string) {
+      await api.delete(`/products/${id}`);
+      this.items = this.items.filter((p) => p.id !== id);
     },
   },
 });
